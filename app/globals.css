@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --navy: #0a1628;
+  --navy-light: #1e293b;
+  --saffron: #f97316;
+  --saffron-dark: #ea580c;
+  --india-green: #15803d;
+  --blue-accent: #2563eb;
+  --blue-light: #3b82f6;
+  --gold: #f59e0b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-navy: var(--navy);
+  --color-navy-light: var(--navy-light);
+  --color-saffron: var(--saffron);
+  --color-saffron-dark: var(--saffron-dark);
+  --color-india-green: var(--india-green);
+  --color-blue-accent: var(--blue-accent);
+  --color-blue-light: var(--blue-light);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Skip to content link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 100;
+  padding: 8px 16px;
+  background: var(--saffron);
+  color: #fff;
+  border-radius: 0 0 8px 8px;
+  font-weight: 600;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, var(--saffron) 0%, var(--gold) 50%, var(--saffron-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero diagonal background */
+.hero-bg {
+  background: linear-gradient(135deg, var(--navy) 0%, #0f2942 40%, #162d50 70%, var(--navy-light) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 80%;
+  height: 200%;
+  background: radial-gradient(ellipse, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to top, rgba(255,255,255,0.03), transparent);
+  pointer-events: none;
+}
+
+/* Animated underline for nav links */
+.nav-link {
+  position: relative;
+  transition: color 0.2s;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--saffron);
+  transition: width 0.3s ease;
+}
+.nav-link:hover::after,
+.nav-link:focus::after {
+  width: 100%;
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+/* Stat counter animation */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stat-animate {
+  animation: countUp 0.6s ease forwards;
+}
+
+/* Pulse ring for CTA */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+  70% { box-shadow: 0 0 0 12px rgba(249, 115, 22, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+.pulse-cta:hover {
+  animation: pulse-ring 1.5s infinite;
+}
+
+/* Section divider */
+.section-divider {
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--saffron), var(--gold));
+  border-radius: 2px;
+}
+
+/* Focus visible styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--saffron);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Pattern overlay */
+.pattern-overlay {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255,255,255,0.02) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
