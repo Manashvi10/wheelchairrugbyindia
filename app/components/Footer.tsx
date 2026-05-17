@@ -71,9 +71,11 @@ export default function Footer() {
           {/* Brand column */}
           <div>
             <a href="#home" className="flex items-center gap-3 mb-5 group">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-saffron to-gold flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Accessibility className="w-5 h-5 text-white" />
-              </div>
+              <img 
+                src="/images/logo (2).png" 
+                alt="WRFI Logo" 
+                className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
+              />
               <span className="text-white font-bold text-xl tracking-tight">
                 WRFI
               </span>

@@ -43,9 +43,11 @@ export default function Header() {
               className="flex items-center gap-3 group"
               aria-label="WRFI Home"
             >
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-saffron to-gold flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                <Accessibility className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
+              <img 
+                src="/images/logo (2).png" 
+                alt="WRFI Logo" 
+                className="w-12 h-12 sm:w-16 sm:h-16 object-contain group-hover:scale-105 transition-transform"
+              />
               <div className="flex flex-col">
                 <span className="text-white font-bold text-lg sm:text-xl tracking-tight leading-tight">
                   WRFI

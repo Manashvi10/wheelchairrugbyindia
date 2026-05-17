@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     "para sports",
     "disability sports",
   ],
+  icons: {
+    icon: "/images/logo (2).png",
+    shortcut: "/images/logo (2).png",
+    apple: "/images/logo (2).png",
+  },
 };
 
 export default function RootLayout({
