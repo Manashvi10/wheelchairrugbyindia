@@ -11,7 +11,7 @@ const featured = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1569517282132-25d22f4573e6?auto=format&fit=crop&w=800&q=80",
+      "/images/g5.jpg",
     category: "International",
     title: "Team India Secures Historic Bronze At Asia-Oceania Qualifiers",
     excerpt:

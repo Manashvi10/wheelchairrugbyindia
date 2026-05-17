@@ -1,39 +1,39 @@
 const teamMembers = [
   {
-    name: "Rajesh Kumar",
-    role: "President",
+    name: "Prabal Pratap Singh (Raghu Bhaiya)",
+    role: "Mentor",
     image:
       "/images/o.jpeg",
   },
   {
-    name: "Priya Sharma",
-    role: "Vice President",
+    name: "Rajnish jaiswal",
+    role: "Patron",
     image:
       "/images/on.jpeg",
   },
   {
-    name: "Amit Singh",
-    role: "Head Coach",
+    name: "Dr Vivek Parihar",
+    role: "President and Director",
     image:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
+      "/images/image.png",
   },
   {
-    name: "Neha Patel",
-    role: "Secretary General",
+    name: "Dr Pardeep Kumar Mahajan",
+    role: "Vice President",
     image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80",
+      "/images/img.png",
   },
   {
-    name: "Vikram Rao",
-    role: "Technical Director",
+    name: "Mohammad Shahid",
+    role: "Sports Director",
     image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      "/images/imag.png",
   },
   {
-    name: "Sunita Devi",
-    role: "Women's Team Manager",
+    name: "Swati Singh",
+    role: "Treasurer",
     image:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80",
+      "/images/imgg.png",
   },
 ];
 

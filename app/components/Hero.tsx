@@ -80,28 +80,28 @@ export default function Hero() {
       {/* Slider controls */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+        className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all"
         aria-label="Previous slide"
       >
-        <ChevronLeft className="w-6 h-6" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+        className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all"
         aria-label="Next slide"
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
       {/* Slide indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      <div className="absolute bottom-20 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 sm:gap-2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all ${
+            className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all ${
               index === currentSlide
-                ? "bg-saffron w-8"
+                ? "bg-saffron w-6 sm:w-8"
                 : "bg-white/40 hover:bg-white/60"
             }`}
             aria-label={`Go to slide ${index + 1}`}
@@ -110,49 +110,49 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-28 pb-20 sm:pt-32 sm:pb-24">
-        <div className="max-w-3xl space-y-6 sm:space-y-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20 pb-16 sm:pt-32 sm:pb-24">
+        <div className="max-w-3xl space-y-4 sm:space-y-8">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full backdrop-blur-sm">
-            <span className="w-2 h-2 rounded-full bg-saffron animate-pulse" />
-            <span className="text-white/90 text-sm font-medium tracking-wide">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/10 border border-white/20 rounded-full backdrop-blur-sm">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-saffron animate-pulse" />
+            <span className="text-white/90 text-xs sm:text-sm font-medium tracking-wide">
               Official Governing Body of Wheelchair Rugby in India
             </span>
           </div>
 
           {/* Heading */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.08] tracking-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.08] tracking-tight">
             Wheelchair Rugby
             <br />
             <span className="text-saffron">Federation of India</span>
           </h1>
 
           {/* Tagline */}
-          <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-white/80 italic">
+          <p className="text-base sm:text-2xl md:text-3xl font-semibold text-white/80 italic">
             &ldquo;Sports With Different Ability&rdquo;
           </p>
 
           {/* Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
             <a
               href="#events"
-              className="pulse-cta inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-saffron hover:bg-saffron-dark text-white font-bold rounded-full text-lg transition-all hover:shadow-xl hover:shadow-saffron/30"
+              className="pulse-cta inline-flex items-center justify-center gap-2 sm:gap-2.5 px-6 py-3 sm:px-8 sm:py-4 bg-saffron hover:bg-saffron-dark text-white font-bold rounded-full text-base sm:text-lg transition-all hover:shadow-xl hover:shadow-saffron/30"
             >
               Explore Events
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-white/10 hover:bg-white/20 border-2 border-white/25 text-white font-bold rounded-full text-lg backdrop-blur-sm transition-all"
+              className="inline-flex items-center justify-center gap-2 sm:gap-2.5 px-6 py-3 sm:px-8 sm:py-4 bg-white/10 hover:bg-white/20 border-2 border-white/25 text-white font-bold rounded-full text-base sm:text-lg backdrop-blur-sm transition-all"
             >
-              <UserPlus className="w-5 h-5" />
+              <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
               Join Us
             </a>
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+        <div className="hidden sm:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2">
           <span className="text-white/40 text-xs font-medium tracking-widest uppercase">
             Scroll
           </span>

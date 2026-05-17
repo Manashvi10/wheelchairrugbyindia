@@ -100,26 +100,28 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Link columns */}
-          {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
-              <h3 className="text-white font-bold text-sm tracking-wider uppercase mb-5">
-                {title}
-              </h3>
-              <ul className="space-y-3">
-                {links.map((link, i) => (
-                  <li key={i}>
-                    <a
-                      href={link.href}
-                      className="text-white/50 text-sm hover:text-saffron transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Link columns - Flex container for mobile */}
+          <div className="flex gap-8 sm:contents">
+            {Object.entries(footerLinks).map(([title, links]) => (
+              <div key={title} className="flex-1 sm:flex-none">
+                <h3 className="text-white font-bold text-sm tracking-wider uppercase mb-5">
+                  {title}
+                </h3>
+                <ul className="space-y-3">
+                  {links.map((link, i) => (
+                    <li key={i}>
+                      <a
+                        href={link.href}
+                        className="text-white/50 text-sm hover:text-saffron transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
 
           {/* Newsletter */}
           <div>
@@ -163,9 +165,8 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Wheelchair Rugby Federation of
             India. All rights reserved.
           </p>
-          <p className="text-white/30 text-xs flex items-center gap-1">
-            Built with <Heart className="w-3 h-3 text-red-500 fill-red-500" />{" "}
-            for Indian para-sports
+          <p className="text-white/40 text-sm text-center sm:text-right flex items-center justify-center sm:justify-end gap-1">
+            Developed with <Heart className="w-3 h-3 text-red-500 fill-red-500" /> by Manashvi Jaiswal
           </p>
         </div>
       </div>

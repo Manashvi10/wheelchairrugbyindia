@@ -39,7 +39,7 @@ export default function AboutPage() {
               <div className="relative">
                 <div className="rounded-3xl overflow-hidden shadow-2xl">
                   <img
-                    src="https://images.unsplash.com/photo-1594882645126-14020914d58d?auto=format&fit=crop&w=800&q=80"
+                    src="/images/abou.png"
                     alt="WRFI team during a wheelchair rugby match"
                     className="w-full h-[350px] sm:h-[450px] object-cover"
                   />
@@ -175,7 +175,7 @@ export default function AboutPage() {
               <div className="order-1 lg:order-2 relative">
                 <div className="rounded-3xl overflow-hidden shadow-2xl">
                   <img
-                    src="https://images.unsplash.com/photo-1461896836934-bd45ba8a0ea6?auto=format&fit=crop&w=800&q=80"
+                    src="/images/abb.jpg"
                     alt="Wheelchair rugby players competing in India"
                     className="w-full h-[350px] sm:h-[450px] object-cover"
                   />

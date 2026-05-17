@@ -203,7 +203,7 @@ export default function EventsPage() {
             <div className="grid lg:grid-cols-2 gap-0 rounded-3xl overflow-hidden bg-white/5 border border-white/10 mb-10">
               <div className="relative h-[260px] sm:h-[340px] lg:h-auto">
                 <img
-                  src="https://images.unsplash.com/photo-1461896836934-bd45ba8a0ea6?auto=format&fit=crop&w=800&q=80"
+                  src="/images/upcome.png"
                   alt="Championship event"
                   className="w-full h-full object-cover"
                 />

@@ -1,31 +1,31 @@
 const galleryImages = [
   {
-    src: "https://images.unsplash.com/photo-1519766304817-4f37bda5a4ea?auto=format&fit=crop&w=600&q=80",
+    src: "/images/g1.jpg",
     alt: "Wheelchair rugby match in action",
     span: "col-span-2 row-span-2",
   },
   {
-    src: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=400&q=80",
+    src: "/images/g2.jpg",
     alt: "Athletes training on the court",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=400&q=80",
+    src: "/images/g3.jpg",
     alt: "Team huddle before a game",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1461896836934-bd45ba8a0ea6?auto=format&fit=crop&w=400&q=80",
+    src: "/images/g4.jpg",
     alt: "Championship celebration",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=400&q=80",
+    src: "/images/g5.jpg",
     alt: "Coaching session with athletes",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=600&q=80",
+    src: "/images/g6.jpg",
     alt: "National championship opening ceremony",
     span: "col-span-2",
   },
