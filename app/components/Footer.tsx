@@ -53,16 +53,16 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: FacebookIcon, label: "Facebook", href: "#" },
-  { icon: TwitterIcon, label: "Twitter", href: "#" },
-  { icon: InstagramIcon, label: "Instagram", href: "#" },
-  { icon: YoutubeIcon, label: "YouTube", href: "#" },
+  { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/WCRFI/" },
+  { icon: TwitterIcon, label: "Twitter", href: "https://x.com/rugby_india" },
+  { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/wcrugby_india/" },
+  { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@WheelchairRugbyIndia" },
 ];
 
 export default function Footer() {
   return (
     <footer
-      className="bg-navy pt-16 sm:pt-20 pb-8"
+      className="bg-navy-light pt-16 sm:pt-20 pb-8"
       role="contentinfo"
       aria-label="Site footer"
     >
@@ -80,7 +80,7 @@ export default function Footer() {
                 WRFI
               </span>
             </a>
-            <p className="text-white/50 text-sm leading-relaxed max-w-xs">
+            <p className="text-white text-sm leading-relaxed max-w-xs">
               Wheelchair Rugby Federation of India — empowering athletes,
               building champions, and championing inclusion through sport.
             </p>
@@ -92,8 +92,10 @@ export default function Footer() {
                   <a
                     key={i}
                     href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={s.label}
-                    className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-white/50 hover:bg-saffron hover:text-white transition-all"
+                    className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-white hover:bg-saffron hover:text-white transition-all"
                   >
                     <Icon className="w-4 h-4" />
                   </a>
@@ -114,7 +116,7 @@ export default function Footer() {
                     <li key={i}>
                       <a
                         href={link.href}
-                        className="text-white/50 text-sm hover:text-saffron transition-colors"
+                        className="text-white text-sm hover:text-saffron transition-colors"
                       >
                         {link.label}
                       </a>
@@ -130,7 +132,7 @@ export default function Footer() {
             <h3 className="text-white font-bold text-sm tracking-wider uppercase mb-5">
               Newsletter
             </h3>
-            <p className="text-white/50 text-sm mb-4">
+            <p className="text-white text-sm mb-4">
               Subscribe for the latest updates, events, and news from WRFI.
             </p>
             <form
@@ -142,7 +144,7 @@ export default function Footer() {
                 type="email"
                 placeholder="Your email"
                 required
-                className="flex-1 min-w-0 px-4 py-2.5 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/30 focus:border-saffron focus:ring-1 focus:ring-saffron/30 outline-none transition-all"
+                className="flex-1 min-w-0 px-4 py-2.5 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/50 focus:border-saffron focus:ring-1 focus:ring-saffron/30 outline-none transition-all"
               />
               <button
                 type="submit"
@@ -163,11 +165,11 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-white/40 text-sm text-center sm:text-left">
+          <p className="text-white text-sm text-center sm:text-left">
             &copy; {new Date().getFullYear()} Wheelchair Rugby Federation of
             India. All rights reserved.
           </p>
-          <p className="text-white/40 text-sm text-center sm:text-right flex items-center justify-center sm:justify-end gap-1">
+          <p className="text-white text-sm text-center sm:text-right flex items-center justify-center sm:justify-end gap-1">
             Developed with <Heart className="w-3 h-3 text-red-500 fill-red-500" /> by Manashvi Jaiswal
           </p>
         </div>

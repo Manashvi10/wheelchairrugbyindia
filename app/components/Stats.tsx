@@ -55,7 +55,7 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
 export default function Stats() {
   return (
     <section
-      className="py-16 sm:py-20 bg-navy relative overflow-hidden"
+      className="py-16 sm:py-20 bg-white relative overflow-hidden"
       aria-label="Impact statistics"
     >
       <div className="pattern-overlay absolute inset-0" />
@@ -64,7 +64,7 @@ export default function Stats() {
           <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
             Our Impact
           </span>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-black text-white tracking-tight">
+          <h2 className="mt-3 text-3xl sm:text-4xl font-black text-navy tracking-tight">
             Numbers That <span className="gradient-text">Inspire</span>
           </h2>
         </div>
@@ -75,15 +75,15 @@ export default function Stats() {
             return (
               <div
                 key={i}
-                className="text-center p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group"
+                className="text-center p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-md hover:shadow-xl transition-all group"
               >
-                <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-white border border-slate-200 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
                   <Icon className={`w-7 h-7 ${stat.color}`} />
                 </div>
                 <p className="text-4xl sm:text-5xl font-black gradient-text mb-2">
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                 </p>
-                <p className="text-white/60 text-sm font-medium">{stat.label}</p>
+                <p className="text-slate-600 text-sm font-medium">{stat.label}</p>
               </div>
             );
           })}

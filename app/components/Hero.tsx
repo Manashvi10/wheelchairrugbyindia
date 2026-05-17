@@ -111,11 +111,11 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20 pb-16 sm:pt-32 sm:pb-24">
-        <div className="max-w-3xl space-y-4 sm:space-y-8">
+        <div className="max-w-3xl space-y-4 sm:space-y-8 pl-10 sm:pl-0">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/10 border border-white/20 rounded-full backdrop-blur-sm">
             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-saffron animate-pulse" />
-            <span className="text-white/90 text-xs sm:text-sm font-medium tracking-wide">
+            <span className="text-white text-xs sm:text-sm font-medium tracking-wide">
               Official Governing Body of Wheelchair Rugby in India
             </span>
           </div>
@@ -128,7 +128,7 @@ export default function Hero() {
           </h1>
 
           {/* Tagline */}
-          <p className="text-base sm:text-2xl md:text-3xl font-semibold text-white/80 italic">
+          <p className="text-base sm:text-2xl md:text-3xl font-semibold text-white italic">
             &ldquo;Sports With Different Ability&rdquo;
           </p>
 
@@ -153,11 +153,11 @@ export default function Hero() {
 
         {/* Scroll indicator */}
         <div className="hidden sm:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2">
-          <span className="text-white/40 text-xs font-medium tracking-widest uppercase">
+          <span className="text-white text-xs font-medium tracking-widest uppercase">
             Scroll
           </span>
           <div className="w-5 h-8 rounded-full border-2 border-white/30 flex justify-center pt-1.5">
-            <div className="w-1 h-2 bg-white/60 rounded-full animate-bounce" />
+            <div className="w-1 h-2 bg-white rounded-full animate-bounce" />
           </div>
         </div>
       </div>

@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import { Quote } from "lucide-react";
 
 const testimonials = [
@@ -28,48 +31,79 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let animFrame: number;
+    let isPaused = false;
+
+    const scroll = () => {
+      if (!isPaused && el) {
+        el.scrollLeft += 0.7;
+        if (el.scrollLeft >= el.scrollWidth / 2) {
+          el.scrollLeft = 0;
+        }
+      }
+      animFrame = requestAnimationFrame(scroll);
+    };
+
+    animFrame = requestAnimationFrame(scroll);
+
+    el.addEventListener("mouseenter", () => (isPaused = true));
+    el.addEventListener("mouseleave", () => (isPaused = false));
+    el.addEventListener("touchstart", () => (isPaused = true), { passive: true });
+    el.addEventListener("touchend", () => setTimeout(() => (isPaused = false), 2000), { passive: true });
+
+    return () => cancelAnimationFrame(animFrame);
+  }, []);
+
+  const cards = [...testimonials, ...testimonials];
+
   return (
     <section
       id="testimonials"
-      className="py-20 sm:py-28 bg-gradient-to-b from-navy to-navy-light relative overflow-hidden"
+      className="py-20 sm:py-28 bg-slate-50 relative overflow-hidden"
       aria-labelledby="testimonials-heading"
     >
       <div className="pattern-overlay absolute inset-0" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="relative z-10">
         {/* Section header */}
-        <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-18">
+        <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-18 px-4 sm:px-6 lg:px-8">
           <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
             Testimonials
           </span>
           <h2
             id="testimonials-heading"
-            className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight"
+            className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-navy tracking-tight"
           >
             Voices of <span className="gradient-text">Inspiration</span>
           </h2>
           <div className="section-divider mx-auto mt-6" />
         </div>
 
-        {/* Testimonial cards */}
-        <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
-          {testimonials.map((t, i) => (
+        {/* Auto-scroll row — all breakpoints */}
+        <div
+          ref={scrollRef}
+          className="flex gap-5 overflow-x-auto scrollbar-hide px-4 sm:px-6 lg:px-8 pb-2"
+          style={{ scrollBehavior: "auto", WebkitOverflowScrolling: "touch" }}
+        >
+          {cards.map((t, i) => (
             <article
               key={i}
-              className="card-hover p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 flex flex-col"
+              className="shrink-0 w-[80vw] sm:w-[420px] lg:w-[400px] p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-md flex flex-col"
             >
               <Quote className="w-8 h-8 text-saffron/60 mb-4 shrink-0" />
-              <p className="text-white/80 leading-relaxed flex-1 italic">
+              <p className="text-slate-700 leading-relaxed flex-1 italic text-sm sm:text-base">
                 &ldquo;{t.quote}&rdquo;
               </p>
-              <div className="flex items-center gap-4 mt-6 pt-6 border-t border-white/10">
-                <img
-                  src={t.image}
-                  alt={t.name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-saffron/30"
-                />
+              <div className="flex items-center gap-4 mt-6 pt-5 border-t border-slate-200">
+                <img src={t.image} alt={t.name} className="w-11 h-11 rounded-full object-cover border-2 border-saffron/30" />
                 <div>
-                  <p className="text-white font-bold text-sm">{t.name}</p>
-                  <p className="text-white/50 text-xs">{t.role}</p>
+                  <p className="text-navy font-bold text-sm">{t.name}</p>
+                  <p className="text-slate-500 text-xs">{t.role}</p>
                 </div>
               </div>
             </article>

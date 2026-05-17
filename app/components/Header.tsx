@@ -1,12 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, Accessibility, ChevronDown } from "lucide-react";
+import { Menu, X, Accessibility, ChevronDown, Bell } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "About Us", href: "/about" },
+  {
+    label: "About Us",
+    href: "/about",
+    dropdown: [
+      { label: "About WRFI", href: "/about" },
+      { label: "Committee Members", href: "/leadership" },
+      { label: "Selection Policy", href: "/selection-policy" },
+    ],
+  },
   { label: "News", href: "/news" },
   { label: "Our History", href: "/history" },
   {
@@ -22,9 +31,12 @@ const navLinks = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [eventsOpen, setEventsOpen] = useState(false);
-  const [mobileEventsOpen, setMobileEventsOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null);
+  
+  const isHomePage = pathname === "/";
 
   return (
     <>
@@ -52,7 +64,7 @@ export default function Header() {
                 <span className="text-white font-bold text-lg sm:text-xl tracking-tight leading-tight">
                   WRFI
                 </span>
-                <span className="text-white/60 text-[10px] sm:text-xs font-medium tracking-wider uppercase leading-tight hidden sm:block">
+                <span className="text-white text-[10px] sm:text-xs font-medium tracking-wider uppercase leading-tight hidden sm:block">
                   Wheelchair Rugby Federation of India
                 </span>
               </div>
@@ -69,24 +81,24 @@ export default function Header() {
                   <div
                     key={link.href}
                     className="relative"
-                    onMouseEnter={() => setEventsOpen(true)}
-                    onMouseLeave={() => setEventsOpen(false)}
+                    onMouseEnter={() => setOpenDropdown(link.label)}
+                    onMouseLeave={() => setOpenDropdown(null)}
                   >
                     <Link
                       href={link.href}
-                      className="nav-link px-4 py-2 text-sm font-medium text-white/80 hover:text-saffron transition-colors rounded-lg inline-flex items-center gap-1"
+                      className="nav-link px-4 py-2 text-sm font-medium text-white hover:text-saffron transition-colors rounded-lg inline-flex items-center gap-1"
                     >
                       {link.label}
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform ${
-                          eventsOpen ? "rotate-180" : ""
+                          openDropdown === link.label ? "rotate-180" : ""
                         }`}
                       />
                     </Link>
                     {/* Dropdown */}
                     <div
                       className={`absolute top-full left-0 mt-1 w-56 bg-navy border border-white/10 rounded-xl shadow-2xl overflow-hidden transition-all duration-200 ${
-                        eventsOpen
+                        openDropdown === link.label
                           ? "opacity-100 visible translate-y-0"
                           : "opacity-0 invisible -translate-y-2"
                       }`}
@@ -96,7 +108,7 @@ export default function Header() {
                         <Link
                           key={sub.href}
                           href={sub.href}
-                          className="block px-5 py-3 text-sm text-white/70 hover:text-saffron hover:bg-white/5 transition-colors font-medium border-b border-white/5 last:border-0"
+                          className="block px-5 py-3 text-sm text-white hover:text-saffron hover:bg-white/5 transition-colors font-medium border-b border-white/5 last:border-0"
                         >
                           {sub.label}
                         </Link>
@@ -107,7 +119,7 @@ export default function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="nav-link px-4 py-2 text-sm font-medium text-white/80 hover:text-saffron transition-colors rounded-lg"
+                    className="nav-link px-4 py-2 text-sm font-medium text-white hover:text-saffron transition-colors rounded-lg"
                   >
                     {link.label}
                   </Link>
@@ -152,19 +164,19 @@ export default function Header() {
               link.dropdown ? (
                 <div key={link.href}>
                   <button
-                    onClick={() => setMobileEventsOpen(!mobileEventsOpen)}
-                    className="flex items-center justify-between w-full px-4 py-3 text-white/80 hover:text-saffron hover:bg-white/5 rounded-lg transition-colors font-medium"
+                    onClick={() => setMobileOpenDropdown(mobileOpenDropdown === link.label ? null : link.label)}
+                    className="flex items-center justify-between w-full px-4 py-3 text-white hover:text-saffron hover:bg-white/5 rounded-lg transition-colors font-medium"
                   >
                     {link.label}
                     <ChevronDown
                       className={`w-4 h-4 transition-transform ${
-                        mobileEventsOpen ? "rotate-180" : ""
+                        mobileOpenDropdown === link.label ? "rotate-180" : ""
                       }`}
                     />
                   </button>
                   <div
                     className={`overflow-hidden transition-all duration-200 ${
-                      mobileEventsOpen ? "max-h-48" : "max-h-0"
+                      mobileOpenDropdown === link.label ? "max-h-48" : "max-h-0"
                     }`}
                   >
                     {link.dropdown.map((sub) => (
@@ -172,7 +184,7 @@ export default function Header() {
                         key={sub.href}
                         href={sub.href}
                         onClick={() => setMobileOpen(false)}
-                        className="block pl-10 pr-4 py-2.5 text-white/60 hover:text-saffron text-sm font-medium transition-colors"
+                        className="block pl-10 pr-4 py-2.5 text-white hover:text-saffron text-sm font-medium transition-colors"
                       >
                         {sub.label}
                       </Link>
@@ -184,7 +196,7 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block px-4 py-3 text-white/80 hover:text-saffron hover:bg-white/5 rounded-lg transition-colors font-medium"
+                  className="block px-4 py-3 text-white hover:text-saffron hover:bg-white/5 rounded-lg transition-colors font-medium"
                 >
                   {link.label}
                 </Link>
@@ -200,6 +212,46 @@ export default function Header() {
           </div>
         </div>
       </header>
+
+      {/* News ticker - fixed below header (only on home page) */}
+      {isHomePage && (
+        <div
+          className="fixed left-0 right-0 z-40 bg-white border-b border-slate-200 shadow-sm top-16 sm:top-20"
+          role="region"
+          aria-label="Latest announcement"
+        >
+        <div className="relative h-11 sm:h-12 overflow-hidden">
+          {/* Scrolling viewport (full width — text passes behind buttons) */}
+          <div className="marquee-viewport absolute inset-0">
+            <div className="marquee-track h-full">
+              {[...Array(4)].map((_, i) => (
+                <span key={i} className="inline-flex items-center text-slate-800 font-semibold text-sm sm:text-base">
+                  <span className="px-10">
+                    The Wheelchair Rugby Federation of India proudly celebrates our incredible athletes for qualifying to represent India at the Asian Wheelchair Rugby Championship
+                  </span>
+                  <span className="text-saffron font-bold text-lg" aria-hidden="true">◆</span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Left "Updates" badge — overlay on top of marquee */}
+          <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center justify-center w-[46px] sm:w-auto sm:px-6 bg-navy text-white text-[8px] sm:text-sm font-bold uppercase tracking-widest shadow-[4px_0_10px_rgba(0,0,0,0.15)]">
+            <span className="hidden sm:inline">Updates</span>
+            <Bell className="w-4 h-4 sm:hidden" />
+          </div>
+
+          {/* Right "View all" button — overlay on top of marquee */}
+          <a
+            href="/news"
+            className="absolute right-0 top-0 bottom-0 z-10 flex items-center justify-center w-[46px] sm:w-auto sm:px-6 bg-saffron hover:bg-saffron-dark text-white text-[8px] sm:text-sm font-bold uppercase tracking-widest transition-colors shadow-[-4px_0_10px_rgba(0,0,0,0.15)]"
+          >
+            <span className="hidden sm:inline">View All</span>
+            <span className="sm:hidden">ALL</span>
+          </a>
+        </div>
+        </div>
+      )}
     </>
   );
 }

@@ -150,7 +150,7 @@ export default function HistoryPage() {
               Our History &amp;{" "}
               <span className="gradient-text">Achievements</span>
             </h1>
-            <p className="mt-4 text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
               From 1977 to today — the story of wheelchair rugby and India&apos;s
               remarkable journey in the sport.
             </p>
@@ -218,7 +218,7 @@ export default function HistoryPage() {
                 <span className="gradient-text">Para Nationals</span>
               </h2>
               <div className="section-divider mx-auto mt-6" />
-              <p className="mt-6 text-lg text-white/60 leading-relaxed">
+              <p className="mt-6 text-lg text-white leading-relaxed">
                 A record of excellence at the National Wheelchair Rugby Championships
                 organized by WRFI across India.
               </p>
@@ -240,12 +240,12 @@ export default function HistoryPage() {
                     {item.event}
                   </h3>
                   <div className="space-y-2 text-sm">
-                    <p className="flex items-center gap-2 text-white/50">
-                      <MapPin className="w-4 h-4 text-white/30 shrink-0" />
+                    <p className="flex items-center gap-2 text-white">
+                      <MapPin className="w-4 h-4 text-white shrink-0" />
                       {item.location}
                     </p>
-                    <p className="flex items-center gap-2 text-white/50">
-                      <Award className="w-4 h-4 text-white/30 shrink-0" />
+                    <p className="flex items-center gap-2 text-white">
+                      <Award className="w-4 h-4 text-white shrink-0" />
                       {item.result}
                     </p>
                   </div>
@@ -310,7 +310,7 @@ export default function HistoryPage() {
                 <h3 className="text-2xl sm:text-3xl font-black text-white mb-3">
                   India is on the Rise
                 </h3>
-                <p className="text-white/60 max-w-2xl mx-auto mb-6">
+                <p className="text-white max-w-2xl mx-auto mb-6">
                   From our first international appearance to earning medals — the
                   journey has just begun. Support Team India as we aim for the
                   Paralympic Games.
@@ -323,7 +323,7 @@ export default function HistoryPage() {
                   ].map((s, i) => (
                     <div key={i}>
                       <p className="text-3xl font-black gradient-text">{s.value}</p>
-                      <p className="text-white/50 text-sm mt-1">{s.label}</p>
+                      <p className="text-white text-sm mt-1">{s.label}</p>
                     </div>
                   ))}
                 </div>

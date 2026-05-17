@@ -35,12 +35,12 @@ function Countdown() {
       {boxes.map((b, i) => (
         <div
           key={i}
-          className="flex flex-col items-center bg-white/10 border border-white/15 rounded-xl px-3 sm:px-5 py-3 min-w-[64px] backdrop-blur-sm"
+          className="flex flex-col items-center bg-white border border-slate-200 rounded-xl px-3 sm:px-5 py-3 min-w-[64px] shadow-sm"
         >
-          <span className="text-2xl sm:text-3xl font-black text-white tabular-nums">
+          <span className="text-2xl sm:text-3xl font-black text-navy tabular-nums">
             {String(b.value).padStart(2, "0")}
           </span>
-          <span className="text-white/50 text-[10px] sm:text-xs font-medium uppercase tracking-wider mt-1">
+          <span className="text-slate-500 text-[10px] sm:text-xs font-medium uppercase tracking-wider mt-1">
             {b.label}
           </span>
         </div>
@@ -53,7 +53,7 @@ export default function Events() {
   return (
     <section
       id="events"
-      className="py-20 sm:py-28 bg-navy relative overflow-hidden"
+      className="py-20 sm:py-28 bg-slate-50 relative overflow-hidden"
       aria-labelledby="events-heading"
     >
       <div className="pattern-overlay absolute inset-0" />
@@ -65,7 +65,7 @@ export default function Events() {
           </span>
           <h2
             id="events-heading"
-            className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight"
+            className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-navy tracking-tight"
           >
             Next Big <span className="gradient-text">Tournament</span>
           </h2>
@@ -73,7 +73,7 @@ export default function Events() {
         </div>
 
         {/* Featured event card */}
-        <div className="grid lg:grid-cols-2 gap-0 rounded-3xl overflow-hidden bg-white/5 border border-white/10">
+        <div className="grid lg:grid-cols-2 gap-0 rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-lg">
           {/* Poster / Image */}
           <div className="relative h-[280px] sm:h-[360px] lg:h-auto">
             <img
@@ -88,23 +88,23 @@ export default function Events() {
           </div>
 
           {/* Event details */}
-          <div className="p-8 sm:p-10 lg:p-12 flex flex-col justify-center space-y-6">
-            <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+          <div className="p-6 sm:p-10 lg:p-12 flex flex-col justify-center space-y-5 overflow-hidden">
+            <h3 className="text-xl sm:text-3xl font-black text-navy leading-tight">
               WRFI National Wheelchair Rugby Championship 2026
             </h3>
 
-            <div className="flex flex-col gap-3 text-white/60">
-              <span className="flex items-center gap-2.5">
+            <div className="flex flex-col gap-3 text-slate-600">
+              <span className="flex items-center gap-2.5 min-w-0">
                 <Calendar className="w-5 h-5 text-saffron shrink-0" />
-                <span>August 15 – 20, 2026</span>
+                <span className="truncate">August 15 – 20, 2026</span>
               </span>
-              <span className="flex items-center gap-2.5">
+              <span className="flex items-center gap-2.5 min-w-0">
                 <MapPin className="w-5 h-5 text-saffron shrink-0" />
-                <span>Thyagaraj Sports Complex, New Delhi</span>
+                <span className="truncate sm:whitespace-normal">Thyagaraj Sports Complex, New Delhi</span>
               </span>
             </div>
 
-            <p className="text-white/50 leading-relaxed">
+            <p className="text-slate-600 leading-relaxed">
               The premier national wheelchair rugby tournament featuring teams
               from across India. Six days of intense competition, skill
               showcases, and an inclusive sports festival.
@@ -112,7 +112,7 @@ export default function Events() {
 
             {/* Countdown */}
             <div>
-              <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">
+              <p className="text-slate-500 text-xs font-semibold uppercase tracking-widest mb-3">
                 Event starts in
               </p>
               <Countdown />

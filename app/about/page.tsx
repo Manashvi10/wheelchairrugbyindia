@@ -24,7 +24,7 @@ export default function AboutPage() {
             <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
               About <span className="gradient-text">WRFI</span>
             </h1>
-            <p className="mt-4 text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
               Championing wheelchair rugby and inclusive sports across India
               since 2009.
             </p>
@@ -201,7 +201,7 @@ export default function AboutPage() {
                 Our <span className="gradient-text">Aim</span>
               </h2>
               <div className="section-divider mx-auto mt-6" />
-              <p className="mt-6 text-lg text-white/60 leading-relaxed">
+              <p className="mt-6 text-lg text-white leading-relaxed">
                 WRFI is driven by a singular vision — to make wheelchair rugby a
                 mainstream sport in India and empower every athlete with a disability.
               </p>
@@ -246,7 +246,7 @@ export default function AboutPage() {
                       <Icon className="w-7 h-7 text-white" />
                     </div>
                     <h3 className="text-lg font-bold text-white mb-3">{item.title}</h3>
-                    <p className="text-white/50 text-sm leading-relaxed">{item.desc}</p>
+                    <p className="text-white text-sm leading-relaxed">{item.desc}</p>
                   </div>
                 );
               })}

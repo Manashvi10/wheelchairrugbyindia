@@ -141,7 +141,7 @@ export default function NewsPage() {
             <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
               Latest <span className="gradient-text">News</span>
             </h1>
-            <p className="mt-4 text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
               Updates, announcements, and inspiring stories from the world of
               wheelchair rugby in India.
             </p>
@@ -294,7 +294,7 @@ export default function NewsPage() {
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
               Never Miss an Update
             </h2>
-            <p className="text-white/60 text-lg mb-8">
+            <p className="text-white text-lg mb-8">
               Subscribe to our newsletter for the latest news, events, and
               stories delivered to your inbox.
             </p>
@@ -306,7 +306,7 @@ export default function NewsPage() {
                 type="email"
                 placeholder="Your email address"
                 required
-                className="flex-1 px-5 py-4 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:border-saffron focus:ring-2 focus:ring-saffron/30 outline-none transition-all"
+                className="flex-1 px-5 py-4 rounded-full bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:border-saffron focus:ring-2 focus:ring-saffron/30 outline-none transition-all"
               />
               <button
                 type="submit"

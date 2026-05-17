@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     "disability sports",
   ],
   icons: {
-    icon: "/images/logo (2).png",
-    shortcut: "/images/logo (2).png",
-    apple: "/images/logo (2).png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 };
 

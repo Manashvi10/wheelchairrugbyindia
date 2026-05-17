@@ -3,8 +3,8 @@
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
-  --navy: #0a1628;
-  --navy-light: #1e293b;
+  --navy: #012c5f;
+  --navy-light: #1b77a8;
   --saffron: #f97316;
   --saffron-dark: #ea580c;
   --india-green: #15803d;
@@ -154,6 +154,32 @@ body {
   outline-offset: 2px;
   border-radius: 2px;
 }
+
+/* News ticker marquee animation */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  animation: marquee-scroll 35s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+.marquee-viewport {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Hide scrollbar */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* Pattern overlay */
 .pattern-overlay {

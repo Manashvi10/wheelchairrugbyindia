@@ -223,7 +223,7 @@ export default function Contact() {
             {/* Quick support */}
             <div className="p-6 rounded-2xl bg-gradient-to-br from-navy to-navy-light text-white">
               <h3 className="font-bold text-lg mb-2">Need Quick Support?</h3>
-              <p className="text-white/60 text-sm mb-4">
+              <p className="text-white text-sm mb-4">
                 For urgent queries about events, registrations, or athlete
                 support, reach out during office hours (Mon–Fri, 10AM–5PM IST).
               </p>

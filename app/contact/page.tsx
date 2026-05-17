@@ -52,7 +52,7 @@ export default function ContactPage() {
             <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
               Contact <span className="gradient-text">Us</span>
             </h1>
-            <p className="mt-4 text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
               Have questions? Want to volunteer, start a team, or partner with
               us? We&apos;d love to hear from you.
             </p>

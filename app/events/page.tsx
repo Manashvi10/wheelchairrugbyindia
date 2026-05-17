@@ -42,7 +42,7 @@ function Countdown() {
           <span className="text-2xl sm:text-3xl font-black text-white tabular-nums">
             {String(b.value).padStart(2, "0")}
           </span>
-          <span className="text-white/50 text-[10px] sm:text-xs font-medium uppercase tracking-wider mt-1">
+          <span className="text-white text-[10px] sm:text-xs font-medium uppercase tracking-wider mt-1">
             {b.label}
           </span>
         </div>
@@ -176,7 +176,7 @@ export default function EventsPage() {
             <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
               Events &amp; <span className="gradient-text">Tournaments</span>
             </h1>
-            <p className="mt-4 text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed">
+            <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
               From national championships to international stages — the complete
               WRFI event calendar.
             </p>
@@ -216,7 +216,7 @@ export default function EventsPage() {
                 <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
                   WRFI National Championship 2026
                 </h3>
-                <div className="flex flex-col gap-3 text-white/60 text-sm">
+                <div className="flex flex-col gap-3 text-white text-sm">
                   <span className="flex items-center gap-2.5">
                     <Calendar className="w-5 h-5 text-saffron shrink-0" />
                     August 15 – 20, 2026
@@ -227,7 +227,7 @@ export default function EventsPage() {
                   </span>
                 </div>
                 <div>
-                  <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">
+                  <p className="text-white text-xs font-semibold uppercase tracking-widest mb-3">
                     Event starts in
                   </p>
                   <Countdown />
@@ -259,10 +259,10 @@ export default function EventsPage() {
                       </span>
                     </div>
                     <h3 className="text-white font-bold text-lg mb-2">{event.title}</h3>
-                    <p className="text-white/50 text-sm leading-relaxed mb-4">
+                    <p className="text-white text-sm leading-relaxed mb-4">
                       {event.description}
                     </p>
-                    <div className="flex flex-wrap gap-4 text-sm text-white/40">
+                    <div className="flex flex-wrap gap-4 text-sm text-white">
                       <span className="flex items-center gap-1.5">
                         <Calendar className="w-4 h-4" />
                         {event.date}
