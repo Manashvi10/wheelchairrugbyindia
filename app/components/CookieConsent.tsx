@@ -1,34 +1,41 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
 
 export default function CookieConsent() {
+  // Mandatory consent: always shown on every visit until the user picks an option.
+  // We intentionally do NOT persist the choice across visits so the banner is
+  // guaranteed to appear on every (desktop OR mobile) page load — fixes the
+  // "sometimes shows, sometimes not" mobile issue.
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem("wrfi-cookie-consent");
-    if (!consent) {
-      setIsVisible(true);
-    }
+    // Show once mounted on client (avoids SSR/hydration timing on mobile).
+    setIsVisible(true);
   }, []);
 
+  // Lock body scroll while modal is visible so it can't be missed on mobile.
+  useEffect(() => {
+    if (!isVisible) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isVisible]);
+
   const handleAcceptAll = () => {
-    localStorage.setItem("wrfi-cookie-consent", "all");
+    try { sessionStorage.setItem("wrfi-cookie-consent", "all"); } catch {}
     setIsVisible(false);
   };
 
   const handleEssentialOnly = () => {
-    localStorage.setItem("wrfi-cookie-consent", "essential");
+    try { sessionStorage.setItem("wrfi-cookie-consent", "essential"); } catch {}
     setIsVisible(false);
   };
 
   const handleCustomize = () => {
-    localStorage.setItem("wrfi-cookie-consent", "custom");
-    setIsVisible(false);
-  };
-
-  const handleClose = () => {
+    try { sessionStorage.setItem("wrfi-cookie-consent", "custom"); } catch {}
     setIsVisible(false);
   };
 
@@ -42,20 +49,14 @@ export default function CookieConsent() {
       {/* Modal */}
       <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-          {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 sm:px-8 py-4 sm:py-6 flex items-start justify-between rounded-t-2xl">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-navy">
-                WRFI: We value your privacy.
-              </h2>
-            </div>
-            <button
-              onClick={handleClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors ml-4"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
+          {/* Header — no close button: user must pick a consent option */}
+          <div className="sticky top-0 bg-white border-b border-gray-200 px-6 sm:px-8 py-4 sm:py-6 rounded-t-2xl">
+            <h2 className="text-xl sm:text-2xl font-bold text-navy">
+              WRFI: We value your privacy.
+            </h2>
+            <p className="mt-1 text-xs sm:text-sm text-saffron font-semibold">
+              Please choose a preference to continue.
+            </p>
           </div>
 
           {/* Content */}

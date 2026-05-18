@@ -9,6 +9,7 @@ import History from "./components/History";
 import Team from "./components/Team";
 import Testimonials from "./components/Testimonials";
 import Gallery from "./components/Gallery";
+import Sponsors from "./components/Sponsors";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import CookieConsent from "./components/CookieConsent";
@@ -26,6 +27,7 @@ export default function Home() {
         <VisionMission />
         <History />
         <Gallery />
+        <Sponsors />
         <Contact />
         <Testimonials />
       </main>

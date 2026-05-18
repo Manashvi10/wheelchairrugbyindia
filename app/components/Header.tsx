@@ -14,6 +14,7 @@ const navLinks = [
       { label: "About WRFI", href: "/about" },
       { label: "Committee Members", href: "/leadership" },
       { label: "Selection Policy", href: "/selection-policy" },
+      { label: "Our Partners", href: "/partners" },
     ],
   },
   { label: "News", href: "/news" },
@@ -25,6 +26,7 @@ const navLinks = [
       { label: "Upcoming Tournaments", href: "/events#upcoming" },
       { label: "National", href: "/events#national" },
       { label: "International", href: "/events#international" },
+      { label: "Gallery", href: "/gallery" },
     ],
   },
   { label: "Contact Us", href: "/contact" },
@@ -176,7 +178,7 @@ export default function Header() {
                   </button>
                   <div
                     className={`overflow-hidden transition-all duration-200 ${
-                      mobileOpenDropdown === link.label ? "max-h-48" : "max-h-0"
+                      mobileOpenDropdown === link.label ? "max-h-64" : "max-h-0"
                     }`}
                   >
                     {link.dropdown.map((sub) => (
