@@ -38,23 +38,6 @@ body {
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
 }
 
-/* Skip to content link for accessibility */
-.skip-link {
-  position: absolute;
-  top: -100%;
-  left: 16px;
-  z-index: 100;
-  padding: 8px 16px;
-  background: var(--saffron);
-  color: #fff;
-  border-radius: 0 0 8px 8px;
-  font-weight: 600;
-  transition: top 0.2s;
-}
-.skip-link:focus {
-  top: 0;
-}
-
 /* Gradient text utility */
 .gradient-text {
   background: linear-gradient(135deg, var(--saffron) 0%, var(--gold) 50%, var(--saffron-dark) 100%);

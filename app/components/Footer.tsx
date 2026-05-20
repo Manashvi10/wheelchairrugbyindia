@@ -36,12 +36,12 @@ function YoutubeIcon({ className }: { className?: string }) {
 
 const footerLinks = {
   "Quick Links": [
-    { label: "Home", href: "#home" },
-    { label: "About Us", href: "#about" },
-    { label: "News", href: "#news" },
-    { label: "Our History", href: "#history" },
-    { label: "Events", href: "#events" },
-    { label: "Contact Us", href: "#contact" },
+    { label: "Home", href: "/" },
+    { label: "About Us", href: "/about" },
+    { label: "News", href: "/news" },
+    { label: "Our History", href: "/history" },
+    { label: "Events", href: "/events" },
+    { label: "Contact Us", href: "/contact" },
   ],
   Resources: [
     { label: "Athlete Registration", href: "#" },
@@ -72,7 +72,7 @@ export default function Footer() {
           <div>
             <a href="#home" className="flex items-center gap-3 mb-5 group">
               <img 
-                src="/images/logo (2).png" 
+                src="/images/logo1.png" 
                 alt="WRFI Logo" 
                 className="w-10 h-10 object-contain group-hover:scale-105 transition-transform"
               />
@@ -170,7 +170,7 @@ export default function Footer() {
             India. All rights reserved.
           </p>
           <p className="text-white text-sm text-center sm:text-right flex items-center justify-center sm:justify-end gap-1">
-            Developed with <Heart className="w-3 h-3 text-red-500 fill-red-500" /> by Manashvi Jaiswal
+            Developed with <Heart className="w-3 h-3 text-red-500 fill-red-500" /> by Metro Zone Group
           </p>
         </div>
       </div>

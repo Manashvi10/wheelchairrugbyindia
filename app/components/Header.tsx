@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, Accessibility, ChevronDown, Bell } from "lucide-react";
+import { Menu, X, Accessibility, ChevronDown, ChevronRight, Bell } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -42,9 +42,6 @@ export default function Header() {
 
   return (
     <>
-      <a href="#main-content" className="skip-link">
-        Skip to main content
-      </a>
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-navy/95 backdrop-blur-md border-b border-white/10"
         role="banner"
@@ -58,7 +55,7 @@ export default function Header() {
               aria-label="WRFI Home"
             >
               <img 
-                src="/images/logo (2).png" 
+                src="/images/logo1.png" 
                 alt="WRFI Logo" 
                 className="w-12 h-12 sm:w-16 sm:h-16 object-contain group-hover:scale-105 transition-transform"
               />
@@ -152,33 +149,68 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile nav */}
-        <div
-          id="mobile-menu"
-          className={`lg:hidden overflow-hidden transition-all duration-300 ${
-            mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-          }`}
-          role="navigation"
-          aria-label="Mobile navigation"
-        >
-          <div className="px-4 pb-6 pt-2 space-y-1 bg-navy border-t border-white/10">
+      </header>
+
+      {/* Mobile nav - full screen overlay */}
+      <div
+        id="mobile-menu"
+        className={`lg:hidden fixed inset-0 z-[60] bg-white transition-all duration-300 ${
+          mobileOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+        role="navigation"
+        aria-label="Mobile navigation"
+      >
+        <div className="flex flex-col h-full overflow-y-auto">
+          {/* Top bar */}
+          <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200">
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="p-2 -ml-2 text-navy hover:text-saffron transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <Link
+              href="/"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2"
+              aria-label="WRFI Home"
+            >
+              <img
+                src="/images/logo1.png"
+                alt="WRFI Logo"
+                className="w-9 h-9 object-contain"
+              />
+              <span className="text-navy font-bold text-lg tracking-tight">WRFI</span>
+            </Link>
+            <div className="w-10" aria-hidden="true" />
+          </div>
+
+          {/* Nav list */}
+          <nav className="flex-1">
             {navLinks.map((link) =>
               link.dropdown ? (
-                <div key={link.href}>
+                <div key={link.href} className="border-b border-slate-200">
                   <button
-                    onClick={() => setMobileOpenDropdown(mobileOpenDropdown === link.label ? null : link.label)}
-                    className="flex items-center justify-between w-full px-4 py-3 text-white hover:text-saffron hover:bg-white/5 rounded-lg transition-colors font-medium"
+                    onClick={() =>
+                      setMobileOpenDropdown(
+                        mobileOpenDropdown === link.label ? null : link.label
+                      )
+                    }
+                    className="flex items-center justify-between w-full px-5 py-5 text-navy hover:bg-slate-50 transition-colors"
                   >
-                    {link.label}
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform ${
-                        mobileOpenDropdown === link.label ? "rotate-180" : ""
+                    <span className="font-bold text-base uppercase tracking-wide">
+                      {link.label}
+                    </span>
+                    <ChevronRight
+                      className={`w-5 h-5 text-navy transition-transform ${
+                        mobileOpenDropdown === link.label ? "rotate-90" : ""
                       }`}
                     />
                   </button>
                   <div
-                    className={`overflow-hidden transition-all duration-200 ${
-                      mobileOpenDropdown === link.label ? "max-h-64" : "max-h-0"
+                    className={`overflow-hidden transition-all duration-200 bg-slate-50 ${
+                      mobileOpenDropdown === link.label ? "max-h-96" : "max-h-0"
                     }`}
                   >
                     {link.dropdown.map((sub) => (
@@ -186,7 +218,7 @@ export default function Header() {
                         key={sub.href}
                         href={sub.href}
                         onClick={() => setMobileOpen(false)}
-                        className="block pl-10 pr-4 py-2.5 text-white hover:text-saffron text-sm font-medium transition-colors"
+                        className="block pl-8 pr-5 py-3 text-slate-700 hover:text-saffron text-sm font-medium border-t border-slate-200 first:border-t-0"
                       >
                         {sub.label}
                       </Link>
@@ -198,22 +230,35 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block px-4 py-3 text-white hover:text-saffron hover:bg-white/5 rounded-lg transition-colors font-medium"
+                  className="flex items-center justify-between px-5 py-5 text-navy hover:bg-slate-50 transition-colors border-b border-slate-200"
                 >
-                  {link.label}
+                  <span className="font-bold text-base uppercase tracking-wide">
+                    {link.label}
+                  </span>
+                  <ChevronRight className="w-5 h-5 text-navy" />
                 </Link>
               )
             )}
+          </nav>
+
+          {/* Tagline band */}
+          <div className="bg-navy text-white text-center py-3 px-4 text-xs font-bold uppercase tracking-widest">
+            Wheelchair Rugby
+Federation of India
+          </div>
+
+          {/* CTA */}
+          <div className="px-5 py-5 bg-white">
             <Link
               href="/contact"
               onClick={() => setMobileOpen(false)}
-              className="block mt-3 mx-4 text-center px-5 py-3 bg-saffron hover:bg-saffron-dark text-white font-semibold rounded-full transition-colors"
+              className="block text-center px-5 py-3.5 bg-saffron hover:bg-saffron-dark text-white font-semibold rounded-full transition-colors shadow-lg shadow-saffron/25"
             >
               Get Involved
             </Link>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* News ticker - fixed below header (only on home page) */}
       {isHomePage && (

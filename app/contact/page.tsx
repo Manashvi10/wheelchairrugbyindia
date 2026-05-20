@@ -197,9 +197,9 @@ export default function ContactPage() {
                       <div>
                         <p className="text-sm font-semibold text-navy">Address</p>
                         <p className="text-slate-500 text-sm mt-0.5">
-                          Jawaharlal Nehru Stadium Complex,
+                          House no 53 shivlok phase 4
                           <br />
-                          Lodhi Road, New Delhi – 110003
+                          Khajurikalan Piplani Bhopal Madhya Pradesh 462022
                         </p>
                       </div>
                     </div>
@@ -210,10 +210,10 @@ export default function ContactPage() {
                       <div>
                         <p className="text-sm font-semibold text-navy">Phone</p>
                         <a
-                          href="tel:+911123456789"
+                          href="tel:+917223051792"
                           className="text-slate-500 text-sm hover:text-saffron transition-colors"
                         >
-                          +91 11 2345 6789
+                          +91 7223051792
                         </a>
                       </div>
                     </div>
@@ -224,10 +224,10 @@ export default function ContactPage() {
                       <div>
                         <p className="text-sm font-semibold text-navy">Email</p>
                         <a
-                          href="mailto:info@wrfi.in"
+                          href="mailto:wcrfi.india@gmail.com"
                           className="text-slate-500 text-sm hover:text-saffron transition-colors"
                         >
-                          info@wrfi.in
+                          wcrfi.india@gmail.com
                         </a>
                       </div>
                     </div>
@@ -255,10 +255,10 @@ export default function ContactPage() {
                   </p>
                   <div className="flex gap-3">
                     {[
-                      { icon: FacebookIcon, label: "Facebook", href: "#" },
-                      { icon: TwitterIcon, label: "Twitter", href: "#" },
-                      { icon: InstagramIcon, label: "Instagram", href: "#" },
-                      { icon: YoutubeIcon, label: "YouTube", href: "#" },
+                      { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/WCRFI/" },
+                      { icon: TwitterIcon, label: "Twitter", href: "https://x.com/rugby_india" },
+                      { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/wcrugby_india/" },
+                      { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@WheelchairRugbyIndia" },
                     ].map((social, i) => {
                       const Icon = social.icon;
                       return (
@@ -279,7 +279,7 @@ export default function ContactPage() {
                 <div className="rounded-2xl overflow-hidden border border-slate-100 h-[220px] bg-slate-100 relative">
                   <iframe
                     title="WRFI Office Location"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3503.5849384489557!2d77.23700361548426!3d28.582191982437234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce2f31a6c1c3d%3A0x9a2e4b0e5e2b4f0a!2sJawaharlal%20Nehru%20Stadium!5e0!3m2!1sen!2sin!4v1640000000000!5m2!1sen!2sin"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3667.3!2d77.4!3d23.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDEyJzAwLjAiTiA3N8KwMjQnMDAuMCJF!5e0!3m2!1sen!2sin!4v1640000000000!5m2!1sen!2sin"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -307,7 +307,7 @@ export default function ContactPage() {
               {[
                 {
                   q: "How can I join WRFI as an athlete?",
-                  a: "Fill out the contact form above with your details, or email us at info@wrfi.in. We welcome athletes with physical disabilities from all states of India.",
+                  a: "Fill out the contact form above with your details, or email us at wcrfi.india@gmail.com. We welcome athletes with physical disabilities from all states of India.",
                 },
                 {
                   q: "Does WRFI provide equipment and wheelchairs?",

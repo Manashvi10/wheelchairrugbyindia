@@ -158,10 +158,10 @@ export default function Contact() {
                   <div>
                     <p className="text-sm font-semibold text-navy">Email</p>
                     <a
-                      href="mailto:info@wrfi.in"
+                      href="mailto:wcrfi.india@gmail.com"
                       className="text-slate-600 text-sm hover:text-saffron transition-colors"
                     >
-                      info@wrfi.in
+                      wcrfi.india@gmail.com
                     </a>
                   </div>
                 </div>
@@ -172,10 +172,10 @@ export default function Contact() {
                   <div>
                     <p className="text-sm font-semibold text-navy">Phone</p>
                     <a
-                      href="tel:+911123456789"
+                      href="tel:+917223051792"
                       className="text-slate-600 text-sm hover:text-saffron transition-colors"
                     >
-                      +91 11 2345 6789
+                      +91 7223051792
                     </a>
                   </div>
                 </div>
@@ -186,9 +186,9 @@ export default function Contact() {
                   <div>
                     <p className="text-sm font-semibold text-navy">Address</p>
                     <p className="text-slate-600 text-sm">
-                      Jawaharlal Nehru Stadium Complex,
+                      House no 53 shivlok phase 4
                       <br />
-                      Lodhi Road, New Delhi – 110003
+                      Khajurikalan Piplani Bhopal Madhya Pradesh 462022
                     </p>
                   </div>
                 </div>
@@ -200,10 +200,10 @@ export default function Contact() {
               <h3 className="text-lg font-bold text-navy mb-4">Follow Us</h3>
               <div className="flex gap-3">
                 {[
-                  { icon: FacebookIcon, label: "Facebook", href: "#" },
-                  { icon: TwitterIcon, label: "Twitter", href: "#" },
-                  { icon: InstagramIcon, label: "Instagram", href: "#" },
-                  { icon: YoutubeIcon, label: "YouTube", href: "#" },
+                  { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/WCRFI/" },
+                  { icon: TwitterIcon, label: "Twitter", href: "https://x.com/rugby_india" },
+                  { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/wcrugby_india/" },
+                  { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@WheelchairRugbyIndia" },
                 ].map((social, i) => {
                   const Icon = social.icon;
                   return (
@@ -228,7 +228,7 @@ export default function Contact() {
                 support, reach out during office hours (Mon–Fri, 10AM–5PM IST).
               </p>
               <a
-                href="tel:+911123456789"
+                href="tel:+917223051792"
                 className="inline-flex items-center gap-2 text-saffron font-semibold text-sm hover:text-gold transition-colors"
               >
                 <Phone className="w-4 h-4" />
