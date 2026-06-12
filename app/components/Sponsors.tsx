@@ -31,11 +31,11 @@ export default function Sponsors() {
             Proudly Supported By
           </span>
           <h2 className="mt-2 text-2xl sm:text-3xl font-black text-slate-700 tracking-tight">
-            THE WORLDWIDE PARTNERS
+            OUR PROUD SPONSORS
           </h2>
           <div className="section-divider mt-4 mx-auto" />
           <p className="mt-4 text-slate-500 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">
-            Our sponsors and partners make inclusive sport possible in India.
+            Our sponsors make inclusive sport possible in India.
           </p>
         </div>
 

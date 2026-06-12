@@ -1,4 +1,22 @@
-export default function About() {
+type AboutData = {
+  video_url?: string; since_year?: string; section_badge?: string;
+  title?: string; title_gradient?: string; body1?: string; body2?: string;
+  btn1_text?: string; btn1_url?: string; btn2_text?: string; btn2_url?: string;
+};
+
+export default function About({ data }: { data?: unknown }) {
+  const d = (data as AboutData) ?? {};
+  const videoUrl = d.video_url ?? "https://www.youtube.com/embed/vZL79Cq20eo?autoplay=1&mute=1&loop=1&playlist=vZL79Cq20eo&controls=1&modestbranding=1&rel=0";
+  const sinceYear = d.since_year ?? "2009";
+  const badge = d.section_badge ?? "About WRFI";
+  const title = d.title ?? "Empowering Athletes,";
+  const titleGrad = d.title_gradient ?? "Transforming Lives";
+  const body1 = d.body1 ?? "The Wheelchair Rugby Federation of India (WRFI) is the official governing body for wheelchair rugby in the country. Affiliated with the International Wheelchair Rugby Federation (IWRF), WRFI has been championing inclusive sports since wheelchair rugby was introduced in India in 2009.";
+  const body2 = d.body2 ?? "Our mission is to develop, promote, and make wheelchair rugby a mainstream competitive sport across India — empowering athletes with disabilities, building world-class teams, and representing India on the global stage.";
+  const btn1Text = d.btn1_text ?? "Our Journey";
+  const btn1Url = d.btn1_url ?? "#history";
+  const btn2Text = d.btn2_text ?? "Our Mission";
+  const btn2Url = d.btn2_url ?? "#vision";
   return (
     <section
       id="about"
@@ -13,7 +31,7 @@ export default function About() {
               <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                 <iframe
                   className="absolute top-0 left-0 w-full h-full"
-                  src="https://www.youtube.com/embed/vZL79Cq20eo?autoplay=1&mute=1&loop=1&playlist=vZL79Cq20eo&controls=1&modestbranding=1&rel=0"
+                  src={videoUrl}
                   title="Wheelchair Rugby Federation of India"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -25,52 +43,29 @@ export default function About() {
             <div className="absolute -top-4 -left-4 w-32 h-32 bg-blue-accent/10 rounded-full -z-10" />
             {/* Floating badge */}
             <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6 bg-white/95 backdrop-blur-sm rounded-xl sm:rounded-2xl px-3 py-2 sm:p-4 shadow-lg border border-slate-100">
-              <p className="text-navy font-black text-base sm:text-2xl">Since 2009</p>
+              <p className="text-navy font-black text-base sm:text-2xl">Since {sinceYear}</p>
               <p className="text-slate-500 text-xs sm:text-sm font-medium">Wheelchair Rugby in India</p>
             </div>
           </div>
 
           {/* Text side */}
           <div className="space-y-6">
-            <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
-              About WRFI
-            </span>
+            <span className="text-saffron font-semibold text-sm tracking-widest uppercase">{badge}</span>
             <h2
               id="about-heading"
               className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy tracking-tight leading-tight"
             >
-              Empowering Athletes,{" "}
-              <span className="gradient-text">Transforming Lives</span>
+              {title}{" "}
+              <span className="gradient-text">{titleGrad}</span>
             </h2>
             <div className="section-divider" />
 
-            <p className="text-lg text-slate-600 leading-relaxed">
-              The <strong className="text-navy">Wheelchair Rugby Federation of India (WRFI)</strong> is
-              the official governing body for wheelchair rugby in the country.
-              Affiliated with the International Wheelchair Rugby Federation
-              (IWRF), WRFI has been championing inclusive sports since wheelchair
-              rugby was introduced in India in <strong className="text-navy">2009</strong>.
-            </p>
-            <p className="text-lg text-slate-600 leading-relaxed">
-              Our mission is to develop, promote, and make wheelchair rugby a
-              mainstream competitive sport across India — empowering athletes
-              with disabilities, building world-class teams, and representing
-              India on the global stage.
-            </p>
+            <p className="text-lg text-slate-600 leading-relaxed">{body1}</p>
+            <p className="text-lg text-slate-600 leading-relaxed">{body2}</p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <a
-                href="#history"
-                className="inline-flex items-center justify-center px-6 py-3 bg-navy hover:bg-navy-light text-white font-semibold rounded-full transition-all"
-              >
-                Our Journey
-              </a>
-              <a
-                href="#vision"
-                className="inline-flex items-center justify-center px-6 py-3 border-2 border-navy/20 hover:border-saffron text-navy font-semibold rounded-full transition-all"
-              >
-                Our Mission
-              </a>
+              <a href={btn1Url} className="inline-flex items-center justify-center px-6 py-3 bg-navy hover:bg-navy-light text-white font-semibold rounded-full transition-all">{btn1Text}</a>
+              <a href={btn2Url} className="inline-flex items-center justify-center px-6 py-3 border-2 border-navy/20 hover:border-saffron text-navy font-semibold rounded-full transition-all">{btn2Text}</a>
             </div>
           </div>
         </div>

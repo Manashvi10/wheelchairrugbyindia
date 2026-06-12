@@ -3,34 +3,19 @@
 import { useEffect, useRef } from "react";
 import { Quote } from "lucide-react";
 
-const testimonials = [
-  {
-    quote:
-      "Wheelchair rugby changed my life. WRFI gave me a platform to compete, to dream big, and to prove that disability is not inability.",
-    name: "Arjun Mehta",
-    role: "National Team Athlete",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
-  },
-  {
-    quote:
-      "Being part of WRFI has been the most rewarding experience. The community, the support, the spirit — it's like a second family.",
-    name: "Kavita Joshi",
-    role: "Women's Team Captain",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80",
-  },
-  {
-    quote:
-      "I started as a volunteer and now I coach 30 athletes. WRFI's mission of inclusion is real — you see it in every training session.",
-    name: "Deepak Verma",
-    role: "State Coach, Maharashtra",
-    image:
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80",
-  },
+type TestimonialItem = {
+  name: string; role?: string; quote_text?: string; quote?: string;
+  avatar_url?: string | null; image?: string;
+};
+
+const DEFAULT_TESTIMONIALS: TestimonialItem[] = [
+  { quote_text: "Wheelchair rugby changed my life. WRFI gave me a platform to compete, to dream big, and to prove that disability is not inability.", name: "Arjun Mehta", role: "National Team Athlete", avatar_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" },
+  { quote_text: "Being part of WRFI has been the most rewarding experience. The community, the support, the spirit — it's like a second family.", name: "Kavita Joshi", role: "Women's Team Captain", avatar_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" },
+  { quote_text: "I started as a volunteer and now I coach 30 athletes. WRFI's mission of inclusion is real — you see it in every training session.", name: "Deepak Verma", role: "State Coach, Maharashtra", avatar_url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80" },
 ];
 
-export default function Testimonials() {
+export default function Testimonials({ items }: { items?: TestimonialItem[] }) {
+  const testimonials: TestimonialItem[] = items?.length ? items : DEFAULT_TESTIMONIALS;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,7 +45,7 @@ export default function Testimonials() {
     return () => cancelAnimationFrame(animFrame);
   }, []);
 
-  const cards = [...testimonials, ...testimonials];
+  const cards = testimonials.length >= 3 ? [...testimonials, ...testimonials] : [...testimonials, ...testimonials, ...testimonials];
 
   return (
     <section
@@ -97,10 +82,10 @@ export default function Testimonials() {
             >
               <Quote className="w-8 h-8 text-saffron/60 mb-4 shrink-0" />
               <p className="text-slate-700 leading-relaxed flex-1 italic text-sm sm:text-base">
-                &ldquo;{t.quote}&rdquo;
+                &ldquo;{t.quote_text ?? t.quote}&rdquo;
               </p>
               <div className="flex items-center gap-4 mt-6 pt-5 border-t border-slate-200">
-                <img src={t.image} alt={t.name} className="w-11 h-11 rounded-full object-cover border-2 border-saffron/30" />
+                <img src={t.avatar_url ?? t.image ?? ""} alt={t.name} className="w-11 h-11 rounded-full object-cover border-2 border-saffron/30" />
                 <div>
                   <p className="text-navy font-bold text-sm">{t.name}</p>
                   <p className="text-slate-500 text-xs">{t.role}</p>

@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Users, Calendar, MapPin, UserCheck } from "lucide-react";
+import { Users, Calendar, MapPin, UserCheck, LucideIcon } from "lucide-react";
 
-const stats = [
-  { icon: Users, value: 220, suffix: "+", label: "Players", color: "text-saffron" },
-  { icon: Calendar, value: 15, suffix: "+", label: "Events", color: "text-blue-accent" },
-  { icon: MapPin, value: 10, suffix: "+", label: "States", color: "text-india-green" },
-  { icon: UserCheck, value: 40, suffix: "+", label: "Women Athletes", color: "text-gold" },
+const ICON_MAP: Record<string, LucideIcon> = { Users, Calendar, MapPin, UserCheck };
+const COLORS = ["text-saffron", "text-blue-accent", "text-india-green", "text-gold"];
+
+const DEFAULT_STATS = [
+  { icon: "Users", value: 220, suffix: "+", label: "Players" },
+  { icon: "Calendar", value: 15, suffix: "+", label: "Events" },
+  { icon: "MapPin", value: 10, suffix: "+", label: "States" },
+  { icon: "UserCheck", value: 40, suffix: "+", label: "Women Athletes" },
 ];
+
+type StatItem = { icon?: string; value: number; suffix?: string; label: string };
 
 function AnimatedCounter({ target, suffix }: { target: number; suffix: string }) {
   const [count, setCount] = useState(0);
@@ -52,7 +57,8 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
   );
 }
 
-export default function Stats() {
+export default function Stats({ data }: { data?: unknown[] }) {
+  const stats: StatItem[] = (data as StatItem[] | undefined)?.length ? (data as StatItem[]) : DEFAULT_STATS;
   return (
     <section
       className="py-16 sm:py-20 bg-white relative overflow-hidden"
@@ -71,17 +77,18 @@ export default function Stats() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {stats.map((stat, i) => {
-            const Icon = stat.icon;
+            const Icon = ICON_MAP[stat.icon ?? "Users"] ?? Users;
+            const color = COLORS[i % COLORS.length];
             return (
               <div
                 key={i}
                 className="text-center p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-md hover:shadow-xl transition-all group"
               >
                 <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-white border border-slate-200 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                  <Icon className={`w-7 h-7 ${stat.color}`} />
+                  <Icon className={`w-7 h-7 ${color}`} />
                 </div>
                 <p className="text-4xl sm:text-5xl font-black gradient-text mb-2">
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                  <AnimatedCounter target={stat.value} suffix={stat.suffix ?? "+"} />
                 </p>
                 <p className="text-slate-600 text-sm font-medium">{stat.label}</p>
               </div>

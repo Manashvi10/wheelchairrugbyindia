@@ -34,7 +34,20 @@ function YoutubeIcon({ className }: { className?: string }) {
   );
 }
 
-export default function Contact() {
+type ContactData = {
+  email?: string; phone?: string; address?: string;
+  facebook?: string; instagram?: string; twitter?: string; youtube?: string;
+};
+
+export default function Contact({ data }: { data?: unknown }) {
+  const d = (data as ContactData) ?? {};
+  const email = d.email ?? "wcrfi.india@gmail.com";
+  const phone = d.phone ?? "+91 7223051792";
+  const address = d.address ?? "House no 53 shivlok phase 4, Khajurikalan Piplani Bhopal Madhya Pradesh 462022";
+  const facebook = d.facebook ?? "https://www.facebook.com/WCRFI/";
+  const instagram = d.instagram ?? "https://www.instagram.com/wcrugby_india/";
+  const twitter = d.twitter ?? "https://x.com/rugby_india";
+  const youtube = d.youtube ?? "https://www.youtube.com/@WheelchairRugbyIndia";
   return (
     <section
       id="contact"
@@ -158,10 +171,10 @@ export default function Contact() {
                   <div>
                     <p className="text-sm font-semibold text-navy">Email</p>
                     <a
-                      href="mailto:wcrfi.india@gmail.com"
+                      href={`mailto:${email}`}
                       className="text-slate-600 text-sm hover:text-saffron transition-colors"
                     >
-                      wcrfi.india@gmail.com
+                      {email}
                     </a>
                   </div>
                 </div>
@@ -172,10 +185,10 @@ export default function Contact() {
                   <div>
                     <p className="text-sm font-semibold text-navy">Phone</p>
                     <a
-                      href="tel:+917223051792"
+                      href={`tel:${phone.replace(/\s/g, "")}`}
                       className="text-slate-600 text-sm hover:text-saffron transition-colors"
                     >
-                      +91 7223051792
+                      {phone}
                     </a>
                   </div>
                 </div>
@@ -185,11 +198,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-navy">Address</p>
-                    <p className="text-slate-600 text-sm">
-                      House no 53 shivlok phase 4
-                      <br />
-                      Khajurikalan Piplani Bhopal Madhya Pradesh 462022
-                    </p>
+                    <p className="text-slate-600 text-sm">{address}</p>
                   </div>
                 </div>
               </div>
@@ -200,10 +209,10 @@ export default function Contact() {
               <h3 className="text-lg font-bold text-navy mb-4">Follow Us</h3>
               <div className="flex gap-3">
                 {[
-                  { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/WCRFI/" },
-                  { icon: TwitterIcon, label: "Twitter", href: "https://x.com/rugby_india" },
-                  { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/wcrugby_india/" },
-                  { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@WheelchairRugbyIndia" },
+                  { icon: FacebookIcon, label: "Facebook", href: facebook },
+                  { icon: TwitterIcon, label: "Twitter", href: twitter },
+                  { icon: InstagramIcon, label: "Instagram", href: instagram },
+                  { icon: YoutubeIcon, label: "YouTube", href: youtube },
                 ].map((social, i) => {
                   const Icon = social.icon;
                   return (
@@ -228,7 +237,7 @@ export default function Contact() {
                 support, reach out during office hours (Mon–Fri, 10AM–5PM IST).
               </p>
               <a
-                href="tel:+917223051792"
+                href={`tel:${phone.replace(/\s/g, "")}`}
                 className="inline-flex items-center gap-2 text-saffron font-semibold text-sm hover:text-gold transition-colors"
               >
                 <Phone className="w-4 h-4" />

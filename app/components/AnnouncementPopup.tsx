@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { X, Sparkles } from "lucide-react";
 
@@ -8,16 +9,19 @@ const STORAGE_KEY = "wrfi_asian_qualification_popup_seen";
 
 export default function AnnouncementPopup() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith("/admin");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (isAdmin) return;
     try {
       if (sessionStorage.getItem(STORAGE_KEY)) return;
     } catch {}
 
     const timer = setTimeout(() => setOpen(true), 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isAdmin]);
 
   const close = () => {
     setOpen(false);
@@ -39,7 +43,7 @@ export default function AnnouncementPopup() {
     };
   }, [open]);
 
-  if (!open) return null;
+  if (!open || isAdmin) return null;
 
   return (
     <div

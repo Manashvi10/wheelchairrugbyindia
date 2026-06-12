@@ -96,7 +96,7 @@ export default function Events() {
             <div className="flex flex-col gap-3 text-slate-600">
               <span className="flex items-center gap-2.5 min-w-0">
                 <Calendar className="w-5 h-5 text-saffron shrink-0" />
-                <span className="truncate">August 15 – 20, 2026</span>
+                <span className="truncate">May 15 – 18, 2026</span>
               </span>
               <span className="flex items-center gap-2.5 min-w-0">
                 <MapPin className="w-5 h-5 text-saffron shrink-0" />

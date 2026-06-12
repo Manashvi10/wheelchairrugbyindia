@@ -2,54 +2,39 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  UserPlus,
-} from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, UserPlus } from "lucide-react";
 
-const slides = [
-  {
-    image: "/images/home.jpg",
-    alt: "WRFI Team Photo",
-  },
-  {
-    image: "/images/slider2.png",
-    fallback:
-      "https://images.unsplash.com/photo-1461896836934-bd45ba8a0ea6?auto=format&fit=crop&w=1920&q=80",
-    alt: "Wheelchair rugby players in action",
-  },
-  {
-    image: "/images/slider3.png",
-    fallback:
-      "https://images.unsplash.com/photo-1594882645126-14020914d58d?auto=format&fit=crop&w=1920&q=80",
-    alt: "Wheelchair rugby match",
-  },
+type Slide = { image: string; alt?: string; fallback?: string };
+type Medal = { color: string; label: string };
+type AthleteCard = { name: string; image: string; medals?: Medal[] };
+type HeroData = {
+  slides?: Slide[]; athletes?: AthleteCard[];
+  title?: string; tagline?: string;
+  btn_primary_text?: string; btn_primary_url?: string;
+  btn_secondary_text?: string; btn_secondary_url?: string;
+};
+
+const DEFAULT_SLIDES: Slide[] = [
+  { image: "/images/home.jpg", alt: "WRFI Team Photo" },
+  { image: "/images/slider2.png", fallback: "https://images.unsplash.com/photo-1461896836934-bd45ba8a0ea6?auto=format&fit=crop&w=1920&q=80", alt: "Wheelchair rugby players in action" },
+  { image: "/images/slider3.png", fallback: "https://images.unsplash.com/photo-1594882645126-14020914d58d?auto=format&fit=crop&w=1920&q=80", alt: "Wheelchair rugby match" },
+];
+const DEFAULT_ATHLETES: AthleteCard[] = [
+  { name: "Abhinav Bindra", image: "/images/s1.png", medals: [{ color: "bg-yellow-400", label: "G" }] },
+  { name: "Yogeshwar Dutt", image: "/images/s2.png", medals: [{ color: "bg-orange-500", label: "B" }] },
+  { name: "Manu Bhaker", image: "/images/s3.png", medals: [{ color: "bg-orange-500", label: "B" }, { color: "bg-orange-500", label: "B" }] },
 ];
 
-const athletes = [
-  {
-    name: "Abhinav Bindra",
-    image: "/images/s1.png",
-    medals: [{ color: "bg-yellow-400", label: "G" }],
-  },
-  {
-    name: "Yogeshwar Dutt",
-    image: "/images/s2.png",
-    medals: [{ color: "bg-orange-500", label: "B" }],
-  },
-  {
-    name: "Manu Bhaker",
-    image: "/images/s3.png",
-    medals: [
-      { color: "bg-orange-500", label: "B" },
-      { color: "bg-orange-500", label: "B" },
-    ],
-  },
-];
-
-export default function Hero() {
+export default function Hero({ data }: { data?: unknown }) {
+  const d = (data as HeroData) ?? {};
+  const slides = d.slides?.length ? d.slides : DEFAULT_SLIDES;
+  const athletes = d.athletes?.length ? d.athletes : DEFAULT_ATHLETES;
+  const heroTitle = d.title ?? "Wheelchair Rugby Federation of India";
+  const heroTagline = d.tagline ?? '"Sports With Different Ability"';
+  const btnPrimaryText = d.btn_primary_text ?? "Explore Events";
+  const btnPrimaryUrl = d.btn_primary_url ?? "#events";
+  const btnSecondaryText = d.btn_secondary_text ?? "Join Us";
+  const btnSecondaryUrl = d.btn_secondary_url ?? "#contact";
   const [currentSlide, setCurrentSlide] = useState(0);
   const [pastHero, setPastHero] = useState(false);
 
@@ -175,31 +160,29 @@ export default function Hero() {
                 id="hero-heading"
                 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.08] tracking-tight"
               >
-                Wheelchair Rugby
-                <br />
-                <span className="text-saffron">Federation of India</span>
+                <span className="text-saffron">{heroTitle}</span>
               </h1>
 
               {/* Tagline */}
               <p className="text-base sm:text-2xl md:text-3xl font-semibold text-white italic">
-                &ldquo;Sports With Different Ability&rdquo;
+                {heroTagline}
               </p>
 
               {/* Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
                 <a
-                  href="#events"
+                  href={btnPrimaryUrl}
                   className="pulse-cta inline-flex items-center justify-center gap-2 sm:gap-2.5 px-6 py-3 sm:px-8 sm:py-4 bg-saffron hover:bg-saffron-dark text-white font-bold rounded-full text-base sm:text-lg transition-all hover:shadow-xl hover:shadow-saffron/30"
                 >
-                  Explore Events
+                  {btnPrimaryText}
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
                 <a
-                  href="#contact"
+                  href={btnSecondaryUrl}
                   className="inline-flex items-center justify-center gap-2 sm:gap-2.5 px-6 py-3 sm:px-8 sm:py-4 bg-white/10 hover:bg-white/20 border-2 border-white/25 text-white font-bold rounded-full text-base sm:text-lg backdrop-blur-sm transition-all"
                 >
                   <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Join Us
+                  {btnSecondaryText}
                 </a>
               </div>
             </div>
@@ -282,7 +265,7 @@ export default function Hero() {
                     </p>
                     <div className="w-14 sm:w-10 lg:w-12 h-0.5 bg-saffron mt-2 sm:mt-1.5 mb-2 sm:mb-1.5" />
                     <div className="flex justify-end gap-1">
-                      {a.medals.map((m, mi) => (
+                      {(a.medals ?? []).map((m, mi) => (
                         <span
                           key={mi}
                           className={`w-5 h-5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 rounded-full ${m.color} flex items-center justify-center text-[10px] sm:text-[9px] font-black text-white shadow-md`}

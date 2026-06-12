@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, Accessibility, ChevronDown, ChevronRight, Bell } from "lucide-react";
+import { Menu, X, Accessibility, ChevronDown, ChevronRight, Bell, Shield } from "lucide-react";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -48,8 +48,27 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo */}
-            <Link
+            {/* Left cluster: Admin Login + Logo */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Link
+                href="/admin/login"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-saffron text-white text-xs font-semibold border border-white/20 hover:border-saffron transition-all group"
+                aria-label="Admin login"
+                title="Admin login"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span>Admin</span>
+              </Link>
+              <Link
+                href="/admin/login"
+                className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-saffron text-white border border-white/20 transition"
+                aria-label="Admin login"
+                title="Admin login"
+              >
+                <Shield className="w-4 h-4" />
+              </Link>
+
+              <Link
               href="/"
               className="flex items-center gap-3 group"
               aria-label="WRFI Home"
@@ -68,6 +87,7 @@ export default function Header() {
                 </span>
               </div>
             </Link>
+            </div>
 
             {/* Desktop nav */}
             <nav
@@ -148,7 +168,6 @@ export default function Header() {
             </button>
           </div>
         </div>
-
       </header>
 
       {/* Mobile nav - full screen overlay */}

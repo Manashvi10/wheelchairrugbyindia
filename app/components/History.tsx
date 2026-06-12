@@ -1,42 +1,15 @@
-const milestones = [
-  {
-    year: "1977",
-    title: "Sport Invented",
-    description:
-      "Wheelchair rugby was invented in Winnipeg, Canada by athletes looking for an alternative to wheelchair basketball that would allow quadriplegics to compete equally.",
-    color: "bg-saffron",
-  },
-  {
-    year: "1994",
-    title: "Recognized as Paralympic Sport",
-    description:
-      "Wheelchair rugby was officially recognized as a Paralympic sport and featured as a demonstration event at the 1996 Atlanta Paralympics.",
-    color: "bg-blue-accent",
-  },
-  {
-    year: "2009",
-    title: "Introduced in India",
-    description:
-      "Wheelchair rugby was introduced in India, marking the beginning of a new chapter in Indian para-sports. The first demonstrations and training sessions began.",
-    color: "bg-india-green",
-  },
-  {
-    year: "2019",
-    title: "WRFI Established",
-    description:
-      "The Wheelchair Rugby Federation of India was officially formed, uniting athletes, coaches, and supporters under a single governing body.",
-    color: "bg-saffron",
-  },
-  {
-    year: "2024",
-    title: "International Debut",
-    description:
-      "Team India competed in its first international wheelchair rugby tournament, putting the country on the global wheelchair rugby map.",
-    color: "bg-gold",
-  },
+type Milestone = { year?: string; title?: string; description?: string; color?: string };
+
+const DEFAULT_MILESTONES: Milestone[] = [
+  { year: "1977", title: "Sport Invented", description: "Wheelchair rugby was invented in Winnipeg, Canada by athletes looking for an alternative to wheelchair basketball that would allow quadriplegics to compete equally.", color: "bg-saffron" },
+  { year: "1994", title: "Recognized as Paralympic Sport", description: "Wheelchair rugby was officially recognized as a Paralympic sport and featured as a demonstration event at the 1996 Atlanta Paralympics.", color: "bg-blue-accent" },
+  { year: "2009", title: "Introduced in India", description: "Wheelchair rugby was introduced in India, marking the beginning of a new chapter in Indian para-sports. The first demonstrations and training sessions began.", color: "bg-india-green" },
+  { year: "2019", title: "WRFI Established", description: "The Wheelchair Rugby Federation of India was officially formed, uniting athletes, coaches, and supporters under a single governing body.", color: "bg-saffron" },
+  { year: "2024", title: "International Debut", description: "Team India competed in its first international wheelchair rugby tournament, putting the country on the global wheelchair rugby map.", color: "bg-gold" },
 ];
 
-export default function History() {
+export default function History({ data }: { data?: unknown[] }) {
+  const milestones: Milestone[] = (data as Milestone[] | undefined)?.length ? (data as Milestone[]) : DEFAULT_MILESTONES;
   return (
     <section
       id="history"
@@ -67,10 +40,9 @@ export default function History() {
           <div className="space-y-10">
             {milestones.map((m, i) => (
               <div key={i} className="relative flex gap-6 sm:gap-8 items-start">
-                {/* Dot */}
                 <div className="relative z-10 shrink-0">
                   <div
-                    className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full ${m.color} flex items-center justify-center shadow-lg`}
+                    className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full ${m.color ?? "bg-saffron"} flex items-center justify-center shadow-lg`}
                   >
                     <span className="text-white font-black text-xs sm:text-sm">
                       {m.year}
