@@ -1,5 +1,15 @@
 import mysql from "mysql2/promise";
 
+if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_NAME) {
+  throw new Error(
+    "Database environment variables are missing. Please check your .env file.\n" +
+    `DB_HOST: ${process.env.DB_HOST ? "✓" : "✗"}\n` +
+    `DB_USER: ${process.env.DB_USER ? "✓" : "✗"}\n` +
+    `DB_PASSWORD: ${process.env.DB_PASSWORD ? "✓" : "✗"}\n` +
+    `DB_NAME: ${process.env.DB_NAME ? "✓" : "✗"}`
+  );
+}
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT) || 3306,

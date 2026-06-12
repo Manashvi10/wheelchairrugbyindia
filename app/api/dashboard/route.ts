@@ -7,6 +7,8 @@ export async function GET(req: NextRequest) {
   if (!auth) return unauthorized();
 
   try {
+    console.log("🔍 Dashboard API: Starting database queries...");
+    
     const [[athleteCount], [eventCount], [partnerCount], [msgCount]] =
       await Promise.all([
         pool.execute("SELECT COUNT(*) as c FROM athletes"),
@@ -14,6 +16,8 @@ export async function GET(req: NextRequest) {
         pool.execute("SELECT COUNT(*) as c FROM partners WHERE status = 'Active'"),
         pool.execute("SELECT COUNT(*) as c FROM contact_messages WHERE is_read = 0"),
       ]);
+
+    console.log("✅ Stats queries completed");
 
     const [activity] = await pool.execute(
       "SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 6"
@@ -39,6 +43,8 @@ export async function GET(req: NextRequest) {
       "SELECT title, start_date FROM events WHERE start_date >= CURDATE() ORDER BY start_date ASC LIMIT 1"
     );
 
+    console.log("✅ All queries completed successfully");
+
     const rows = (arr: unknown) => arr as Record<string, unknown>[];
 
     return NextResponse.json({
@@ -59,7 +65,14 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Dashboard error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("❌ Dashboard error:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    return NextResponse.json({ 
+      error: "Database error", 
+      details: error instanceof Error ? error.message : "Unknown error" 
+    }, { status: 500 });
   }
 }
