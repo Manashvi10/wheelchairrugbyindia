@@ -67,7 +67,14 @@ export default function AdminDashboardPage() {
     getSession().then(setUser);
     fetch("/api/dashboard")
       .then((r) => r.json())
-      .then(setData)
+      .then((d) => {
+        if (d && !d.error && d.stats && d.overview) {
+          setData(d);
+        } else {
+          console.error("Dashboard API error:", d);
+        }
+      })
+      .catch((err) => console.error("Dashboard fetch failed:", err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -159,13 +166,13 @@ export default function AdminDashboardPage() {
               <OverviewRow icon={Eye}      label="Most Viewed Page" value="Home"
                 sub="3,248 visits / 30d" />
               <OverviewRow icon={Trophy}   label="Latest Event"
-                value={loading ? "…" : (data?.overview.latestEvent ?? "—")}
+                value={loading ? "…" : (data?.overview?.latestEvent ?? "—")}
                 sub="from database" />
               <OverviewRow icon={Calendar} label="Upcoming Event"
-                value={loading ? "…" : (data?.overview.upcomingEvent ?? "—")}
-                sub={data?.overview.upcomingEventDate ? fmtDate(data.overview.upcomingEventDate) : ""} />
+                value={loading ? "…" : (data?.overview?.upcomingEvent ?? "—")}
+                sub={data?.overview?.upcomingEventDate ? fmtDate(data.overview.upcomingEventDate) : ""} />
               <OverviewRow icon={Users}    label="Latest Athlete"
-                value={loading ? "…" : (data?.overview.latestAthlete ?? "—")}
+                value={loading ? "…" : (data?.overview?.latestAthlete ?? "—")}
                 sub="from database" />
             </div>
           </Card>
