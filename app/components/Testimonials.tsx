@@ -85,7 +85,7 @@ export default function Testimonials({ items }: { items?: TestimonialItem[] }) {
                 &ldquo;{t.quote_text ?? t.quote}&rdquo;
               </p>
               <div className="flex items-center gap-4 mt-6 pt-5 border-t border-slate-200">
-                <img src={t.avatar_url ?? t.image ?? ""} alt={t.name} className="w-11 h-11 rounded-full object-cover border-2 border-saffron/30" />
+                <img src={t.avatar_url ?? t.image ?? "#"} alt={t.name} className="w-11 h-11 rounded-full object-cover border-2 border-saffron/30" />
                 <div>
                   <p className="text-navy font-bold text-sm">{t.name}</p>
                   <p className="text-slate-500 text-xs">{t.role}</p>
