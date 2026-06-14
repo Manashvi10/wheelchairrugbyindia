@@ -142,15 +142,13 @@ export default function EventsPage() {
 
         {/* Upcoming Tournaments */}
         {upcoming.enabled && (
-          <section className="py-16 sm:py-24 bg-navy relative overflow-hidden" id="upcoming">
-            <div className="absolute inset-0 bg-gradient-to-b from-navy-light/30 to-navy" />
-            <div className="pattern-overlay absolute inset-0" />
+          <section className="py-16 sm:py-24 bg-white relative overflow-hidden" id="upcoming">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               <div className="text-center max-w-3xl mx-auto mb-14">
                 <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
                   {upcoming.eyebrow}
                 </span>
-                <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
+                <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-navy tracking-tight">
                   <span className="gradient-text">{upcoming.title}</span>
                 </h2>
                 <div className="section-divider mx-auto mt-6" />
@@ -158,7 +156,7 @@ export default function EventsPage() {
 
               {/* Featured event with countdown */}
               {featuredEvent && (
-                <div className="grid lg:grid-cols-2 gap-0 rounded-3xl overflow-hidden bg-white/5 border border-white/10 mb-10">
+                <div className="grid lg:grid-cols-2 gap-0 rounded-3xl overflow-hidden bg-navy border border-navy/10 shadow-2xl shadow-navy/20 mb-10">
                   <div className="relative h-[260px] sm:h-[340px] lg:h-auto">
                     {featuredEvent.image_url && (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -179,7 +177,7 @@ export default function EventsPage() {
                     <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
                       {featuredEvent.title}
                     </h3>
-                    <div className="flex flex-col gap-3 text-white text-sm">
+                    <div className="flex flex-col gap-3 text-white/80 text-sm">
                       {featuredEvent.date && (
                         <span className="flex items-center gap-2.5">
                           <Calendar className="w-5 h-5 text-saffron shrink-0" />
@@ -195,7 +193,7 @@ export default function EventsPage() {
                     </div>
                     {featuredEvent.countdown_date && (
                       <div>
-                        <p className="text-white text-xs font-semibold uppercase tracking-widest mb-3">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-3">
                           Event starts in
                         </p>
                         <Countdown targetISO={featuredEvent.countdown_date} />
@@ -218,23 +216,23 @@ export default function EventsPage() {
               {nonFeaturedEvents.length > 0 && (
                 <div className="grid md:grid-cols-2 gap-6">
                   {nonFeaturedEvents.map((event, i) => (
-                    <div key={i} className="card-hover p-6 sm:p-7 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10">
+                    <div key={i} className="card-hover p-6 sm:p-7 rounded-2xl bg-navy border border-navy/10 shadow-lg shadow-navy/10 hover:shadow-xl hover:shadow-navy/20 hover:-translate-y-1 transition-all">
                       <div className="flex items-center gap-3 mb-3">
                         <span className={`px-3 py-1 text-xs font-bold rounded-full border ${STATUS_COLORS[event.status_color] || STATUS_COLORS.blue}`}>
                           {event.status}
                         </span>
                       </div>
                       <h3 className="text-white font-bold text-lg mb-2">{event.title}</h3>
-                      <p className="text-white text-sm leading-relaxed mb-4">{event.description}</p>
-                      <div className="flex flex-wrap gap-4 text-sm text-white">
+                      <p className="text-white/70 text-sm leading-relaxed mb-4">{event.description}</p>
+                      <div className="flex flex-wrap gap-4 text-sm text-white/60">
                         {event.date && (
                           <span className="flex items-center gap-1.5">
-                            <Calendar className="w-4 h-4" /> {event.date}
+                            <Calendar className="w-4 h-4 text-saffron" /> {event.date}
                           </span>
                         )}
                         {event.location && (
                           <span className="flex items-center gap-1.5">
-                            <MapPin className="w-4 h-4" /> {event.location}
+                            <MapPin className="w-4 h-4 text-saffron" /> {event.location}
                           </span>
                         )}
                       </div>

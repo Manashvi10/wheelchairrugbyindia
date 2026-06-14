@@ -83,7 +83,8 @@ export default function Header() {
         className="fixed top-0 left-0 right-0 z-50 bg-navy/95 backdrop-blur-md border-b border-white/10"
         role="banner"
       >
-        <div className="w-full pl-1 pr-4 sm:pl-2 sm:pr-6 lg:pl-3 lg:pr-8">
+        <div className="h-[3px] bg-gradient-to-r from-saffron via-gold to-saffron-dark" />
+        <div className="w-full px-6 sm:px-10 lg:px-20 xl:px-28">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
             <Link
