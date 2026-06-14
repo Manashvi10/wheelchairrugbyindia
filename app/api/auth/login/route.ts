@@ -54,9 +54,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const isHttps =
+      req.headers.get("x-forwarded-proto") === "https" ||
+      req.nextUrl.protocol === "https:";
+
     res.cookies.set("wrfi_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isHttps,
       sameSite: "lax",
       ...(remember !== false ? { maxAge: 60 * 60 * 24 * 7 } : {}),
       path: "/",
