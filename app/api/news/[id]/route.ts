@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/app/lib/db";
 import { verifyAuth, unauthorized } from "@/app/lib/auth-server";
+import { logActivity } from "@/app/lib/activity";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await verifyAuth(req);
@@ -13,6 +14,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       `UPDATE news_articles SET title=?, excerpt=?, content=?, image_url=?, category=?, article_url=?, published_date=?, is_featured=?, status=?, sort_order=?, updated_at=NOW() WHERE id=?`,
       [title, excerpt ?? "", content ?? "", image_url ?? "", category ?? "General", article_url ?? "", published_date ?? "", is_featured ?? 0, status ?? "Draft", sort_order ?? 0, id]
     );
+    const action = (status ?? "Draft") === "Published" ? "publish" : "edit";
+    await logActivity(action, `News article ${action === "publish" ? "published" : "updated"}: ${title}`, auth.name);
     return NextResponse.json({ success: true });
   } catch (e: unknown) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
@@ -25,6 +28,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const { id } = await params;
   try {
     await pool.execute("DELETE FROM news_articles WHERE id=?", [id]);
+    await logActivity("delete", `News article deleted (id: ${id})`, auth.name);
     return NextResponse.json({ success: true });
   } catch (e: unknown) {
     return NextResponse.json({ error: String(e) }, { status: 500 });

@@ -1,71 +1,52 @@
+"use client";
+
 import { Flag, Globe, Trophy, Medal, Star, Award, MapPin, Calendar } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useState, useEffect } from "react";
 
-export const metadata = {
-  title: "Our History & Achievements - WRFI",
-  description:
-    "Explore the history of wheelchair rugby, WRFI milestones, and our achievements at Para Nationals and Para International events.",
+const iconMap: Record<string, typeof Flag> = {
+  Flag,
+  Globe,
+  Trophy,
+  Medal,
+  Star,
+  Award,
 };
 
-const timeline = [
-  {
-    year: "1977",
-    title: "Sport Invented",
-    description:
-      "Wheelchair rugby was invented in Winnipeg, Canada by quadriplegic athletes seeking an inclusive competitive sport.",
-    icon: Flag,
-    color: "bg-saffron",
-  },
-  {
-    year: "1993",
-    title: "IWRF Established",
-    description:
-      "The International Wheelchair Rugby Federation was formed to govern the sport globally.",
-    icon: Globe,
-    color: "bg-blue-accent",
-  },
-  {
-    year: "1996",
-    title: "Paralympic Debut",
-    description:
-      "Wheelchair rugby featured as a demonstration sport at the Atlanta Paralympics.",
-    icon: Trophy,
-    color: "bg-india-green",
-  },
-  {
-    year: "2000",
-    title: "Full Medal Sport",
-    description:
-      "Became an official medal sport at the Sydney 2000 Paralympic Games.",
-    icon: Medal,
-    color: "bg-gold",
-  },
-  {
-    year: "2009",
-    title: "Introduced in India",
-    description:
-      "Wheelchair rugby was introduced in India, igniting a new chapter in Indian para-sports history.",
-    icon: Flag,
-    color: "bg-saffron",
-  },
-  {
-    year: "2019",
-    title: "WRFI Established",
-    description:
-      "Wheelchair Rugby Federation of India was officially formed as the national governing body.",
-    icon: Star,
-    color: "bg-blue-accent",
-  },
-  {
-    year: "2024",
-    title: "International Debut",
-    description:
-      "Team India competed in its first international wheelchair rugby tournament on the global stage.",
-    icon: Globe,
-    color: "bg-india-green",
-  },
-];
+const colorMap: Record<string, string> = {
+  saffron: "bg-saffron",
+  blue: "bg-blue-accent",
+  green: "bg-india-green",
+  gold: "bg-gold",
+  "bg-saffron": "bg-saffron",
+  "bg-blue-accent": "bg-blue-accent",
+  "bg-india-green": "bg-india-green",
+  "bg-gold": "bg-gold",
+};
+
+interface TimelineEntry {
+  year: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+}
+
+interface HeroData {
+  eyebrow: string;
+  title: string;
+  description: string;
+  enabled: boolean;
+}
+
+interface TimelineData {
+  eyebrow: string;
+  title: string;
+  entries: TimelineEntry[];
+  enabled: boolean;
+}
+
 
 const paraNationals = [
   {
@@ -134,6 +115,107 @@ const paraInternationals = [
 ];
 
 export default function HistoryPage() {
+  const [heroData, setHeroData] = useState<HeroData>({
+    eyebrow: "Our Legacy",
+    title: "Our History & Achievements",
+    description: "From 1977 to today — the story of wheelchair rugby and India's remarkable journey in the sport.",
+    enabled: true,
+  });
+  const [timelineData, setTimelineData] = useState<TimelineData>({
+    eyebrow: "Milestones",
+    title: "The Journey of Wheelchair Rugby",
+    entries: [
+      {
+        year: "1977",
+        title: "Sport Invented",
+        description: "Wheelchair rugby was invented in Winnipeg, Canada by quadriplegic athletes seeking an inclusive competitive sport.",
+        icon: "Flag",
+        color: "saffron",
+      },
+      {
+        year: "1993",
+        title: "IWRF Established",
+        description: "The International Wheelchair Rugby Federation was formed to govern the sport globally.",
+        icon: "Globe",
+        color: "blue",
+      },
+      {
+        year: "1996",
+        title: "Paralympic Debut",
+        description: "Wheelchair rugby featured as a demonstration sport at the Atlanta Paralympics.",
+        icon: "Trophy",
+        color: "green",
+      },
+      {
+        year: "2000",
+        title: "Full Medal Sport",
+        description: "Became an official medal sport at the Sydney 2000 Paralympic Games.",
+        icon: "Medal",
+        color: "gold",
+      },
+      {
+        year: "2009",
+        title: "Introduced in India",
+        description: "Wheelchair rugby was introduced in India, igniting a new chapter in Indian para-sports history.",
+        icon: "Flag",
+        color: "saffron",
+      },
+      {
+        year: "2019",
+        title: "WRFI Established",
+        description: "Wheelchair Rugby Federation of India was officially formed as the national governing body.",
+        icon: "Star",
+        color: "blue",
+      },
+      {
+        year: "2024",
+        title: "International Debut",
+        description: "Team India competed in its first international wheelchair rugby tournament on the global stage.",
+        icon: "Globe",
+        color: "green",
+      },
+    ],
+    enabled: true,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Hero from history_sections
+        const heroRes = await fetch("/api/history-sections");
+        const { sections } = await heroRes.json();
+        if (sections && sections.hero && sections.hero.data) {
+          setHeroData(sections.hero.data as HeroData);
+        }
+
+        // Timeline from shared cms/timeline (same source as home admin)
+        const tlRes = await fetch("/api/cms/timeline");
+        const tlJson = await tlRes.json();
+        if (tlJson && tlJson.data) {
+          if (Array.isArray(tlJson.data)) {
+            // legacy array format
+            setTimelineData((prev) => ({
+              ...prev,
+              entries: tlJson.data as TimelineEntry[],
+              enabled: tlJson.is_enabled !== false,
+            }));
+          } else if (typeof tlJson.data === "object") {
+            const d = tlJson.data as Partial<TimelineData> & { entries?: TimelineEntry[] };
+            setTimelineData({
+              eyebrow: d.eyebrow || "Milestones",
+              title: d.title || "The Journey of Wheelchair Rugby",
+              entries: d.entries && d.entries.length ? d.entries : [],
+              enabled: tlJson.is_enabled !== false,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch history sections:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <>
       <Header />
@@ -143,67 +225,71 @@ export default function HistoryPage() {
           <div className="pattern-overlay absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy-light/80 to-navy" />
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14">
-            <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
-              Our Legacy
-            </span>
-            <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-              Our History &amp;{" "}
-              <span className="gradient-text">Achievements</span>
-            </h1>
-            <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
-              From 1977 to today — the story of wheelchair rugby and India&apos;s
-              remarkable journey in the sport.
-            </p>
+            {heroData.enabled && (
+              <>
+                <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
+                  {heroData.eyebrow}
+                </span>
+                <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+                  <span className="gradient-text">{heroData.title}</span>
+                </h1>
+                <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
+                  {heroData.description}
+                </p>
+              </>
+            )}
             <div className="section-divider mt-6" />
           </div>
         </section>
 
         {/* Timeline Section */}
-        <section className="py-16 sm:py-24 bg-white" id="timeline">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-14">
-              <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
-                Milestones
-              </span>
-              <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-navy tracking-tight">
-                The Journey of{" "}
-                <span className="gradient-text">Wheelchair Rugby</span>
-              </h2>
-              <div className="section-divider mx-auto mt-6" />
-            </div>
+        {timelineData.enabled && (
+          <section className="py-16 sm:py-24 bg-white" id="timeline">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center max-w-3xl mx-auto mb-14">
+                <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
+                  {timelineData.eyebrow}
+                </span>
+                <h2 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-black text-navy tracking-tight">
+                  <span className="gradient-text">{timelineData.title}</span>
+                </h2>
+                <div className="section-divider mx-auto mt-6" />
+              </div>
 
-            <div className="relative max-w-4xl mx-auto">
-              <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-0.5 bg-slate-200" />
-              <div className="space-y-10">
-                {timeline.map((m, i) => {
-                  const Icon = m.icon;
-                  return (
-                    <div key={i} className="relative flex gap-6 sm:gap-8 items-start">
-                      <div className="relative z-10 shrink-0">
-                        <div
-                          className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full ${m.color} flex items-center justify-center shadow-lg`}
-                        >
-                          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <div className="relative max-w-4xl mx-auto">
+                <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-0.5 bg-slate-200" />
+                <div className="space-y-10">
+                  {timelineData.entries.map((m, i) => {
+                    const Icon = iconMap[m.icon] || Flag;
+                    const colorClass = colorMap[m.color] || "bg-saffron";
+                    return (
+                      <div key={i} className="relative flex gap-6 sm:gap-8 items-start">
+                        <div className="relative z-10 shrink-0">
+                          <div
+                            className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full ${colorClass} flex items-center justify-center shadow-lg`}
+                          >
+                            <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                          </div>
+                        </div>
+                        <div className="card-hover flex-1 p-5 sm:p-7 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white">
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="text-saffron font-black text-sm">{m.year}</span>
+                          </div>
+                          <h3 className="text-lg sm:text-xl font-bold text-navy mb-2">
+                            {m.title}
+                          </h3>
+                          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                            {m.description}
+                          </p>
                         </div>
                       </div>
-                      <div className="card-hover flex-1 p-5 sm:p-7 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-white">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="text-saffron font-black text-sm">{m.year}</span>
-                        </div>
-                        <h3 className="text-lg sm:text-xl font-bold text-navy mb-2">
-                          {m.title}
-                        </h3>
-                        <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-                          {m.description}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Para Nationals Achievements */}
         <section className="py-16 sm:py-24 bg-navy relative overflow-hidden" id="para-nationals">

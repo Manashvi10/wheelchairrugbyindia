@@ -58,7 +58,7 @@ export default async function PartnersPage() {
               {page.badge || "Our Supporters"}
             </span>
             <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-              {page.title || "Partners"} &amp; <span className="gradient-text">{page.title_gradient || "Sponsors"}</span>
+              {page.title || "Partners"} <span className="gradient-text">{page.title_gradient || "Sponsors"}</span>
             </h1>
             <p className="mt-4 text-lg sm:text-xl text-white/80 max-w-2xl leading-relaxed">
               {page.subtitle || "Together with our valued partners, we champion wheelchair rugby and inclusive sports across India."}

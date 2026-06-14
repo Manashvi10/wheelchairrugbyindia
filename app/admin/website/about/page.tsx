@@ -17,7 +17,7 @@ const TABS = [
 ];
 
 /* ─── Types ─── */
-type CommitteeMember = { id: number; name: string; designation: string; bio: string; image_url: string | null; sort_order: number; is_active: number };
+type CommitteeMember = { id: number; name: string; designation: string; bio: string; image_url: string | null; linkedin_url: string | null; sort_order: number; is_active: number };
 type Partner = { id: number; name: string; logo_url: string | null; website: string; category: string; featured: number; status: string; sort_order: number };
 
 /* ─── Shared helpers ─── */
@@ -323,8 +323,9 @@ function CommitteeTab() {
   const [members, setMembers] = useState<CommitteeMember[]>([]);
   const [editing, setEditing] = useState<CommitteeMember | null>(null);
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", designation: "", bio: "", image_url: "", sort_order: 0, is_active: 1 });
+  const [form, setForm] = useState({ name: "", designation: "", bio: "", image_url: "", linkedin_url: "", sort_order: 0, is_active: 1 });
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const fetchMembers = useCallback(async () => {
     const res = await fetch("/api/committee"); const d = await res.json();
@@ -333,17 +334,25 @@ function CommitteeTab() {
 
   useEffect(() => { fetchMembers(); }, [fetchMembers]);
 
-  const openAdd = () => { setForm({ name: "", designation: "", bio: "", image_url: "", sort_order: members.length + 1, is_active: 1 }); setEditing(null); setAdding(true); };
-  const openEdit = (m: CommitteeMember) => { setForm({ name: m.name, designation: m.designation, bio: m.bio ?? "", image_url: m.image_url ?? "", sort_order: m.sort_order, is_active: m.is_active }); setEditing(m); setAdding(true); };
+  const openAdd = () => { setForm({ name: "", designation: "", bio: "", image_url: "", linkedin_url: "", sort_order: members.length + 1, is_active: 1 }); setEditing(null); setSaveError(null); setAdding(true); };
+  const openEdit = (m: CommitteeMember) => { setForm({ name: m.name, designation: m.designation, bio: m.bio ?? "", image_url: m.image_url ?? "", linkedin_url: m.linkedin_url ?? "", sort_order: m.sort_order, is_active: m.is_active }); setEditing(m); setSaveError(null); setAdding(true); };
 
   const handleSave = async () => {
-    setSaving(true);
-    if (editing) {
-      await fetch(`/api/committee/${editing.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    } else {
-      await fetch("/api/committee", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+    setSaving(true); setSaveError(null);
+    try {
+      const res = editing
+        ? await fetch(`/api/committee/${editing.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) })
+        : await fetch("/api/committee", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        setSaveError(d.error || `Save failed (${res.status}). Run /api/seed to apply DB migrations.`);
+        setSaving(false); return;
+      }
+      setAdding(false); fetchMembers();
+    } catch {
+      setSaveError("Network error. Please try again.");
     }
-    setSaving(false); setAdding(false); fetchMembers();
+    setSaving(false);
   };
 
   const handleDelete = async (id: number) => {
@@ -433,11 +442,17 @@ function CommitteeTab() {
                 <Field label="Designation" required><Input value={form.designation} onChange={e => setForm({ ...form, designation: e.target.value })} placeholder="President, Mentor…" /></Field>
               </div>
               <Field label="Bio / Short Description"><Textarea rows={3} value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} /></Field>
+              <Field label="LinkedIn URL" hint="Optional — shown as a link on the leadership page"><Input value={form.linkedin_url} onChange={e => setForm({ ...form, linkedin_url: e.target.value })} placeholder="https://linkedin.com/in/username" /></Field>
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Sort Order"><Input type="number" value={form.sort_order} onChange={e => setForm({ ...form, sort_order: Number(e.target.value) })} /></Field>
                 <Field label="Status"><Toggle checked={!!form.is_active} onChange={v => setForm({ ...form, is_active: v ? 1 : 0 })} label={form.is_active ? "Active" : "Hidden"} /></Field>
               </div>
             </div>
+            {saveError && (
+              <div className="mx-5 mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+                {saveError}
+              </div>
+            )}
             <div className="flex gap-3 justify-end px-5 py-3.5 border-t border-slate-100 sticky bottom-0 bg-white rounded-b-2xl">
               <Button variant="outline" size="sm" onClick={() => setAdding(false)}>Cancel</Button>
               <Button variant="primary" size="sm" onClick={handleSave} disabled={saving || !form.name || !form.designation}>

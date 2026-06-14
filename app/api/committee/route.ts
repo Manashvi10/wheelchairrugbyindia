@@ -17,11 +17,11 @@ export async function POST(req: NextRequest) {
   const auth = await verifyAuth(req);
   if (!auth) return unauthorized();
   try {
-    const { name, designation, bio, image_url, sort_order = 0, is_active = 1 } = await req.json();
+    const { name, designation, bio, image_url, linkedin_url, sort_order = 0, is_active = 1 } = await req.json();
     if (!name || !designation) return NextResponse.json({ error: "name and designation required" }, { status: 400 });
     const [result] = await pool.execute(
-      "INSERT INTO committee_members (name, designation, bio, image_url, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, designation, bio ?? null, image_url ?? null, sort_order, is_active]
+      "INSERT INTO committee_members (name, designation, bio, image_url, linkedin_url, sort_order, is_active) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [name, designation, bio ?? null, image_url ?? null, linkedin_url ?? null, sort_order, is_active]
     );
     return NextResponse.json({ success: true, id: (result as { insertId: number }).insertId }, { status: 201 });
   } catch {

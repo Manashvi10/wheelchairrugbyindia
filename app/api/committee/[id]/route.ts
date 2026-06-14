@@ -9,10 +9,10 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   if (!auth) return unauthorized();
   const { id } = await ctx.params;
   try {
-    const { name, designation, bio, image_url, sort_order, is_active } = await req.json();
+    const { name, designation, bio, image_url, linkedin_url, sort_order, is_active } = await req.json();
     await pool.execute(
-      "UPDATE committee_members SET name=?, designation=?, bio=?, image_url=?, sort_order=?, is_active=?, updated_at=NOW() WHERE id=?",
-      [name, designation, bio ?? null, image_url ?? null, sort_order ?? 0, is_active ?? 1, id]
+      "UPDATE committee_members SET name=?, designation=?, bio=?, image_url=?, linkedin_url=?, sort_order=?, is_active=?, updated_at=NOW() WHERE id=?",
+      [name, designation, bio ?? null, image_url ?? null, linkedin_url ?? null, sort_order ?? 0, is_active ?? 1, id]
     );
     return NextResponse.json({ success: true });
   } catch {

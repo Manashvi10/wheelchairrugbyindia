@@ -1,6 +1,7 @@
 "use client";
 
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle2, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
@@ -48,6 +49,35 @@ export default function Contact({ data }: { data?: unknown }) {
   const instagram = d.instagram ?? "https://www.instagram.com/wcrugby_india/";
   const twitter = d.twitter ?? "https://x.com/rugby_india";
   const youtube = d.youtube ?? "https://www.youtube.com/@WheelchairRugbyIndia";
+
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("submitting");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, source: "home" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setStatus("error");
+        setErrorMsg(data?.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+      setStatus("success");
+      setForm({ name: "", email: "", subject: "", message: "" });
+      setTimeout(() => setStatus("idle"), 5000);
+    } catch {
+      setStatus("error");
+      setErrorMsg("Network error. Please try again.");
+    }
+  };
   return (
     <section
       id="contact"
@@ -78,7 +108,7 @@ export default function Contact({ data }: { data?: unknown }) {
           <div className="lg:col-span-3">
             <form
               className="bg-white rounded-2xl border border-slate-100 p-6 sm:p-8 lg:p-10 shadow-sm"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit}
               aria-label="Contact form"
             >
               <div className="grid sm:grid-cols-2 gap-5">
@@ -93,6 +123,8 @@ export default function Contact({ data }: { data?: unknown }) {
                     type="text"
                     id="name"
                     name="name"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="Your name"
                     required
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-navy placeholder:text-slate-400 focus:bg-white focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none"
@@ -109,6 +141,8 @@ export default function Contact({ data }: { data?: unknown }) {
                     type="email"
                     id="email"
                     name="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="you@example.com"
                     required
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-navy placeholder:text-slate-400 focus:bg-white focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none"
@@ -126,6 +160,8 @@ export default function Contact({ data }: { data?: unknown }) {
                   type="text"
                   id="subject"
                   name="subject"
+                  value={form.subject}
+                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
                   placeholder="How can we help?"
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-navy placeholder:text-slate-400 focus:bg-white focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none"
                 />
@@ -141,17 +177,40 @@ export default function Contact({ data }: { data?: unknown }) {
                   id="message"
                   name="message"
                   rows={5}
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
                   placeholder="Tell us more..."
                   required
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-navy placeholder:text-slate-400 focus:bg-white focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none resize-y"
                 />
               </div>
+
+              {status === "success" && (
+                <div className="mt-5 flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium">
+                  <CheckCircle2 className="w-5 h-5 shrink-0" />
+                  Thank you! Your message has been sent. We&apos;ll get back to you soon.
+                </div>
+              )}
+              {status === "error" && (
+                <div className="mt-5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
+                  {errorMsg || "Something went wrong. Please try again."}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="mt-6 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-saffron hover:bg-saffron-dark text-white font-bold rounded-full text-lg transition-all hover:shadow-lg hover:shadow-saffron/30 pulse-cta"
+                disabled={status === "submitting"}
+                className="mt-6 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-saffron hover:bg-saffron-dark text-white font-bold rounded-full text-lg transition-all hover:shadow-lg hover:shadow-saffron/30 pulse-cta disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <Send className="w-5 h-5" />
-                Send Message
+                {status === "submitting" ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" /> Sending…
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" /> Send Message
+                  </>
+                )}
               </button>
             </form>
           </div>

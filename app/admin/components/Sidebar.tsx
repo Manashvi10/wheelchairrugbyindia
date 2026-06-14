@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { NAV, NavItem } from "../lib/nav";
 
@@ -23,6 +23,29 @@ export default function Sidebar({ open, onClose, collapsed }: Props) {
     });
     return init;
   });
+
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const fetchUnread = useCallback(async () => {
+    try {
+      const res = await fetch("/api/contact");
+      if (!res.ok) return;
+      const data = await res.json();
+      const msgs: { is_read: number }[] = data.messages ?? [];
+      setUnreadCount(msgs.filter((m) => !m.is_read).length);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    fetchUnread();
+    const id = setInterval(fetchUnread, 30000);
+    const onFocus = () => fetchUnread();
+    window.addEventListener("focus", onFocus);
+    return () => { clearInterval(id); window.removeEventListener("focus", onFocus); };
+  }, [fetchUnread, pathname]);
+
+  // Inject dynamic badge for Contact Management
+  const navWithBadges: NavItem[] = NAV.map((n) =>
+    n.href === "/admin/contact" ? { ...n, badge: unreadCount > 0 ? String(unreadCount) : undefined } : n
+  );
 
   const isActive = (href?: string) => {
     if (!href) return false;
@@ -69,7 +92,7 @@ export default function Sidebar({ open, onClose, collapsed }: Props) {
             </div>
           )}
           <ul className="space-y-0.5">
-            {NAV.map((item) => (
+            {navWithBadges.map((item) => (
               <NavRow
                 key={item.label}
                 item={item}

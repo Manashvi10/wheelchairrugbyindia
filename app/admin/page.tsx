@@ -22,12 +22,21 @@ import {
 } from "lucide-react";
 import { PageHeader, Card, CardHeader, StatCard, Button, Badge } from "./components/ui";
 import { getSession, type AdminUser } from "./lib/auth";
+import { timeAgo, formatDateIST as fmtDate } from "@/app/lib/datetime";
 
 type ActivityLog = { id: number; type: string; description: string; actor_name: string; created_at: string };
 type EventRow = { id: number; title: string; start_date: string; end_date: string; venue: string; city: string; registrations: number; status: string };
 type PendingItem = { id: number; name: string; type: string; created_at: string };
+type Stats = {
+  athletes: number; activeAthletes: number;
+  events: number; upcomingEventsCount: number;
+  partners: number;
+  unreadMessages: number; totalMessages: number;
+  news: number;
+  testimonials: number; pendingTestimonials: number;
+};
 type DashboardData = {
-  stats: { athletes: number; events: number; partners: number; unread_messages: number };
+  stats: Stats;
   recentActivity: ActivityLog[];
   upcomingEvents: EventRow[];
   pendingApprovals: PendingItem[];
@@ -46,17 +55,6 @@ const LOG_STYLE: Record<string, { color: string; Icon: typeof Edit3 }> = {
   delete:  { color: "bg-red-100 text-red-600",    Icon: Edit3 },
 };
 
-function timeAgo(ts: string) {
-  const diff = (Date.now() - new Date(ts).getTime()) / 1000;
-  if (diff < 60) return "just now";
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return `${Math.floor(diff / 86400)}d ago`;
-}
-
-function fmtDate(d: string) {
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -66,12 +64,12 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     getSession().then(setUser);
     fetch("/api/dashboard")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d && !d.error && d.stats && d.overview) {
+      .then(async (r) => {
+        const d = await r.json();
+        if (r.ok && d?.stats) {
           setData(d);
         } else {
-          console.error("Dashboard API error:", d);
+          console.error("Dashboard API error:", r.status, d);
         }
       })
       .catch((err) => console.error("Dashboard fetch failed:", err))
@@ -100,10 +98,18 @@ export default function AdminDashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard icon={Users}    label="Total Athletes"   value={loading ? "…" : (stats?.athletes ?? 0)}         color="blue"   delta={{ value: "from DB", up: true }} />
-        <StatCard icon={Trophy}   label="Total Events"     value={loading ? "…" : (stats?.events ?? 0)}           color="orange" delta={{ value: "from DB", up: true }} />
-        <StatCard icon={Handshake} label="Active Sponsors" value={loading ? "…" : (stats?.partners ?? 0)}         color="purple" delta={{ value: "from DB", up: true }} />
-        <StatCard icon={Mail}     label="Unread Messages"  value={loading ? "…" : (stats?.unread_messages ?? 0)}  color="yellow" delta={{ value: "from DB", up: true }} />
+        <StatCard icon={Users}     label="Total Athletes"   value={loading ? "…" : (stats?.athletes ?? 0)}         color="blue"   delta={{ value: `${stats?.activeAthletes ?? 0} active`, up: true }} />
+        <StatCard icon={Trophy}    label="Total Events"     value={loading ? "…" : (stats?.events ?? 0)}           color="orange" delta={{ value: `${stats?.upcomingEventsCount ?? 0} upcoming`, up: true }} />
+        <StatCard icon={Handshake} label="Active Sponsors"  value={loading ? "…" : (stats?.partners ?? 0)}         color="purple" delta={{ value: "from DB", up: true }} />
+        <StatCard icon={Mail}      label="Unread Messages"  value={loading ? "…" : (stats?.unreadMessages ?? 0)}   color="yellow" delta={{ value: `${stats?.totalMessages ?? 0} total`, up: (stats?.unreadMessages ?? 0) > 0 }} />
+      </div>
+
+      {/* Secondary stat row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard icon={Eye}      label="Published News"   value={loading ? "…" : (stats?.news ?? 0)}              color="green"  delta={{ value: "articles live", up: true }} />
+        <StatCard icon={TrendingUp} label="Testimonials"   value={loading ? "…" : (stats?.testimonials ?? 0)}      color="blue"   delta={{ value: `${stats?.pendingTestimonials ?? 0} pending`, up: false }} />
+        <StatCard icon={CalendarPlus} label="Upcoming Events" value={loading ? "…" : (stats?.upcomingEventsCount ?? 0)} color="orange" delta={{ value: "scheduled", up: true }} />
+        <StatCard icon={Users}    label="Active Athletes"  value={loading ? "…" : (stats?.activeAthletes ?? 0)}    color="purple" delta={{ value: `of ${stats?.athletes ?? 0} total`, up: true }} />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -274,10 +280,12 @@ export default function AdminDashboardPage() {
           <CardHeader title="System Health" />
           <div className="p-5 space-y-3.5">
             {[
-              { l: "Athletes in DB",    v: `${stats?.athletes ?? "…"} records`,    p: Math.min(((stats?.athletes ?? 0) / 100) * 100, 100) },
-              { l: "Events in DB",      v: `${stats?.events ?? "…"} records`,      p: Math.min(((stats?.events ?? 0) / 20) * 100, 100) },
-              { l: "Active Sponsors",   v: `${stats?.partners ?? "…"} partners`,   p: Math.min(((stats?.partners ?? 0) / 20) * 100, 100) },
-              { l: "Unread Messages",   v: `${stats?.unread_messages ?? "…"} new`, p: Math.min(((stats?.unread_messages ?? 0) / 50) * 100, 100) },
+              { l: "Athletes in DB",    v: `${stats?.athletes ?? "…"} records`,        p: Math.min(((stats?.athletes ?? 0) / 50) * 100, 100) },
+              { l: "Events in DB",      v: `${stats?.events ?? "…"} total`,             p: Math.min(((stats?.events ?? 0) / 20) * 100, 100) },
+              { l: "Published News",    v: `${stats?.news ?? "…"} articles`,            p: Math.min(((stats?.news ?? 0) / 30) * 100, 100) },
+              { l: "Unread Messages",   v: `${stats?.unreadMessages ?? "…"} unread`,    p: Math.min(((stats?.unreadMessages ?? 0) / 20) * 100, 100) },
+              { l: "Active Sponsors",   v: `${stats?.partners ?? "…"} partners`,        p: Math.min(((stats?.partners ?? 0) / 10) * 100, 100) },
+              { l: "Testimonials",      v: `${stats?.pendingTestimonials ?? "…"} pending`, p: Math.min(((stats?.pendingTestimonials ?? 0) / 5) * 100, 100) },
             ].map((h) => (
               <div key={h.l}>
                 <div className="flex justify-between text-xs mb-1.5">

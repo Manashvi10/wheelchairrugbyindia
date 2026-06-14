@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/app/lib/db";
 import { verifyAuth, unauthorized } from "@/app/lib/auth-server";
+import { logActivity } from "@/app/lib/activity";
 
 type Ctx = { params: Promise<{ section: string }> };
 
@@ -44,6 +45,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
        ON DUPLICATE KEY UPDATE data = VALUES(data), is_enabled = VALUES(is_enabled)`,
       [section, jsonData, enabled]
     );
+    await logActivity("edit", `Homepage section updated: ${section}`, auth.name);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

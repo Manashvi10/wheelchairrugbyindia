@@ -5,8 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { AdminUser, getSession } from "../lib/auth";
+import { AdminThemeProvider } from "../lib/theme";
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminThemeProvider>
+      <AdminShellInner>{children}</AdminShellInner>
+    </AdminThemeProvider>
+  );
+}
+
+function AdminShellInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<AdminUser | null>(null);

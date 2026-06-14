@@ -1,9 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Menu, X, Accessibility, ChevronDown, ChevronRight, Bell } from "lucide-react";
+
+interface MarqueeItem { text: string; link?: string }
+interface MarqueeData {
+  enabled: boolean;
+  badge_label: string;
+  view_all_label: string;
+  view_all_url: string;
+  speed_seconds: number;
+  items: MarqueeItem[];
+}
+const DEFAULT_MARQUEE: MarqueeData = {
+  enabled: true,
+  badge_label: "Updates",
+  view_all_label: "View All",
+  view_all_url: "/news",
+  speed_seconds: 35,
+  items: [
+    { text: "The Wheelchair Rugby Federation of India proudly celebrates our incredible athletes for qualifying to represent India at the Asian Wheelchair Rugby Championship" },
+  ],
+};
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -37,8 +57,25 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(null);
-  
+  const [marquee, setMarquee] = useState<MarqueeData>(DEFAULT_MARQUEE);
+
   const isHomePage = pathname === "/";
+
+  useEffect(() => {
+    if (!isHomePage) return;
+    (async () => {
+      try {
+        const res = await fetch("/api/about-sections/header_marquee", { cache: "no-store" });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.data) {
+          setMarquee({ ...DEFAULT_MARQUEE, ...(json.data as MarqueeData), enabled: !!json.is_enabled });
+        } else {
+          setMarquee((p) => ({ ...p, enabled: !!json.is_enabled }));
+        }
+      } catch {}
+    })();
+  }, [isHomePage]);
 
   return (
     <>
@@ -46,19 +83,18 @@ export default function Header() {
         className="fixed top-0 left-0 right-0 z-50 bg-navy/95 backdrop-blur-md border-b border-white/10"
         role="banner"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full pl-1 pr-4 sm:pl-2 sm:pr-6 lg:pl-3 lg:pr-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Link
+            <Link
               href="/"
-              className="flex items-center gap-3 group"
+              className="flex items-center gap-2 sm:gap-3 group shrink-0"
               aria-label="WRFI Home"
             >
-              <img 
-                src="/images/logo1.png" 
-                alt="WRFI Logo" 
-                className="w-12 h-12 sm:w-16 sm:h-16 object-contain group-hover:scale-105 transition-transform"
+              <img
+                src="/images/logo1.png"
+                alt="WRFI Logo"
+                className="w-11 h-11 sm:w-14 sm:h-14 object-contain group-hover:scale-105 transition-transform"
               />
               <div className="flex flex-col">
                 <span className="text-white font-bold text-lg sm:text-xl tracking-tight leading-tight">
@@ -69,7 +105,6 @@ export default function Header() {
                 </span>
               </div>
             </Link>
-            </div>
 
             {/* Desktop nav */}
             <nav
@@ -262,7 +297,7 @@ Federation of India
       </div>
 
       {/* News ticker - fixed below header (only on home page) */}
-      {isHomePage && (
+      {isHomePage && marquee.enabled && marquee.items.length > 0 && (
         <div
           className="fixed left-0 right-0 z-40 bg-white border-b border-slate-200 shadow-sm top-16 sm:top-20"
           role="region"
@@ -271,30 +306,41 @@ Federation of India
         <div className="relative h-11 sm:h-12 overflow-hidden">
           {/* Scrolling viewport (full width — text passes behind buttons) */}
           <div className="marquee-viewport absolute inset-0">
-            <div className="marquee-track h-full">
-              {[...Array(4)].map((_, i) => (
-                <span key={i} className="inline-flex items-center text-slate-800 font-semibold text-sm sm:text-base">
-                  <span className="px-10">
-                    The Wheelchair Rugby Federation of India proudly celebrates our incredible athletes for qualifying to represent India at the Asian Wheelchair Rugby Championship
-                  </span>
-                  <span className="text-saffron font-bold text-lg" aria-hidden="true">◆</span>
+            <div
+              className="marquee-track h-full"
+              style={{ animationDuration: `${Math.max(5, marquee.speed_seconds)}s` }}
+            >
+              {[...Array(2)].map((_, dup) => (
+                <span key={dup} className="inline-flex items-center text-slate-800 font-semibold text-sm sm:text-base">
+                  {marquee.items.map((it, idx) => (
+                    <span key={`${dup}-${idx}`} className="inline-flex items-center">
+                      {it.link ? (
+                        <a href={it.link} className="px-10 hover:text-saffron transition-colors">
+                          {it.text}
+                        </a>
+                      ) : (
+                        <span className="px-10">{it.text}</span>
+                      )}
+                      <span className="text-saffron font-bold text-lg" aria-hidden="true">◆</span>
+                    </span>
+                  ))}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Left "Updates" badge — overlay on top of marquee */}
+          {/* Left badge — overlay on top of marquee */}
           <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center justify-center w-[46px] sm:w-auto sm:px-6 bg-navy text-white text-[8px] sm:text-sm font-bold uppercase tracking-widest shadow-[4px_0_10px_rgba(0,0,0,0.15)]">
-            <span className="hidden sm:inline">Updates</span>
+            <span className="hidden sm:inline">{marquee.badge_label}</span>
             <Bell className="w-4 h-4 sm:hidden" />
           </div>
 
-          {/* Right "View all" button — overlay on top of marquee */}
+          {/* Right button — overlay on top of marquee */}
           <a
-            href="/news"
+            href={marquee.view_all_url}
             className="absolute right-0 top-0 bottom-0 z-10 flex items-center justify-center w-[46px] sm:w-auto sm:px-6 bg-saffron hover:bg-saffron-dark text-white text-[8px] sm:text-sm font-bold uppercase tracking-widest transition-colors shadow-[-4px_0_10px_rgba(0,0,0,0.15)]"
           >
-            <span className="hidden sm:inline">View All</span>
+            <span className="hidden sm:inline">{marquee.view_all_label}</span>
             <span className="sm:hidden">ALL</span>
           </a>
         </div>

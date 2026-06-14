@@ -8,6 +8,8 @@ import {
   Search,
   Bell,
   Sun,
+  Moon,
+  Clock,
   ExternalLink,
   ChevronDown,
   LogOut,
@@ -17,6 +19,7 @@ import {
   PanelLeftOpen,
 } from "lucide-react";
 import { AdminUser, logout } from "../lib/auth";
+import { useAdminTheme } from "../lib/theme";
 
 interface Props {
   user: AdminUser;
@@ -25,8 +28,31 @@ interface Props {
   onToggleCollapse: () => void;
 }
 
+function useISTClock() {
+  const [now, setNow] = useState<string>("");
+  useEffect(() => {
+    const tick = () => {
+      setNow(
+        new Intl.DateTimeFormat("en-IN", {
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+          timeZone: "Asia/Kolkata",
+        }).format(new Date())
+      );
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+
 export default function Topbar({ user, onMobileMenu, collapsed, onToggleCollapse }: Props) {
   const router = useRouter();
+  const { theme, toggle: toggleTheme } = useAdminTheme();
+  const istNow = useISTClock();
   const [open, setOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -83,6 +109,16 @@ export default function Topbar({ user, onMobileMenu, collapsed, onToggleCollapse
         <div className="flex-1 sm:hidden" />
 
         <div className="flex items-center gap-1 sm:gap-2" ref={ref}>
+          {/* Live IST clock */}
+          <div
+            className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-100 rounded-lg"
+            title="Indian Standard Time"
+          >
+            <Clock className="w-3.5 h-3.5 text-saffron" />
+            <span className="tabular-nums">{istNow}</span>
+            <span className="text-[10px] text-slate-400 font-bold">IST</span>
+          </div>
+
           <Link
             href="/"
             target="_blank"
@@ -91,8 +127,13 @@ export default function Topbar({ user, onMobileMenu, collapsed, onToggleCollapse
             <ExternalLink className="w-3.5 h-3.5" />
             View Site
           </Link>
-          <button className="p-2.5 text-slate-500 hover:text-navy hover:bg-slate-100 rounded-lg" aria-label="Theme">
-            <Sun className="w-4 h-4" />
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 text-slate-500 hover:text-navy hover:bg-slate-100 rounded-lg transition"
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
           {/* Notifications */}

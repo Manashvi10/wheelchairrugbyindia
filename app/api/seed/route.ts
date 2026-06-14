@@ -162,6 +162,25 @@ async function createTables() {
     )
   `);
 
+  await pool.execute(`
+    CREATE TABLE IF NOT EXISTS history_sections (
+      section_key VARCHAR(100) NOT NULL PRIMARY KEY,
+      data LONGTEXT NOT NULL,
+      is_enabled TINYINT(1) DEFAULT 1,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Migration: add linkedin_url to committee_members if missing
+  try {
+    const [cmCols] = await pool.execute(
+      `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='committee_members' AND COLUMN_NAME='linkedin_url'`
+    );
+    if ((cmCols as unknown[]).length === 0) {
+      await pool.execute(`ALTER TABLE committee_members ADD COLUMN linkedin_url VARCHAR(500) DEFAULT NULL`);
+    }
+  } catch { /* ignore */ }
+
   // Migration: add sort_order to partners if missing
   try {
     const [pc] = await pool.execute(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/app/lib/db";
 import { verifyAuth, unauthorized } from "@/app/lib/auth-server";
+import { logActivity } from "@/app/lib/activity";
 
 export async function GET() {
   try {
@@ -23,6 +24,8 @@ export async function POST(req: NextRequest) {
       "INSERT INTO news_articles (title, excerpt, content, image_url, category, article_url, published_date, is_featured, status, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [title, excerpt ?? "", content ?? "", image_url ?? "", category ?? "General", article_url ?? "", published_date ?? "", is_featured ?? 0, status ?? "Draft", sort_order ?? 0]
     );
+    const action = (status ?? "Draft") === "Published" ? "publish" : "create";
+    await logActivity(action, `News article ${action === "publish" ? "published" : "created"}: ${title}`, auth.name);
     return NextResponse.json({ success: true, id: (result as { insertId: number }).insertId });
   } catch (e: unknown) {
     return NextResponse.json({ error: String(e) }, { status: 500 });

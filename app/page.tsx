@@ -30,23 +30,21 @@ export default async function Home() {
     getTestimonials(),
   ]);
 
-  const vis = (cms.sections_visibility?.data as Record<string, boolean>) ?? {};
-
   return (
     <>
       <Header />
       <main id="main-content">
-        {vis.hero !== false && <Hero data={cms.hero?.data} />}
-        {vis.about !== false && <About data={cms.about?.data} />}
-        {vis.announcement !== false && <ImpactBanner data={cms.announcement?.data} />}
-        {vis.stats !== false && <Stats data={cms.stats?.data as unknown[] | undefined} />}
-        {vis.events !== false && <Events />}
-        {vis.vmv !== false && <VisionMission data={cms.vmv?.data as unknown[] | undefined} />}
-        {vis.timeline !== false && <History data={cms.timeline?.data as unknown[] | undefined} />}
-        {vis.gallery !== false && <Gallery />}
-        {vis.partners !== false && <Sponsors />}
-        {vis.contact !== false && <Contact data={cms.contact?.data} />}
-        {vis.testimonials !== false && <Testimonials items={testimonials} />}
+        {cms.hero?.is_enabled !== false && <Hero data={cms.hero?.data} />}
+        {cms.about?.is_enabled !== false && <About data={cms.about?.data} />}
+        {cms.announcement?.is_enabled !== false && <ImpactBanner data={cms.announcement?.data} />}
+        {cms.stats?.is_enabled !== false && <Stats data={cms.stats?.data as unknown[] | undefined} />}
+        {cms.events?.is_enabled !== false && <Events />}
+        {cms.vmv?.is_enabled !== false && <VisionMission data={cms.vmv?.data as unknown[] | undefined} />}
+        {cms.timeline?.is_enabled !== false && <History data={cms.timeline?.data as unknown[] | undefined} />}
+        {cms.gallery?.is_enabled !== false && <Gallery />}
+        {cms.partners?.is_enabled !== false && <Sponsors />}
+        {cms.contact?.is_enabled !== false && <Contact data={cms.contact?.data} />}
+        {cms.testimonials?.is_enabled !== false && <Testimonials items={testimonials} />}
       </main>
       <Footer />
       <CookieConsent />

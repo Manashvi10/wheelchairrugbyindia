@@ -11,13 +11,14 @@ const CACHE_KEY = "wrfi_admin_user";
 
 export async function login(
   email: string,
-  password: string
+  password: string,
+  remember = false
 ): Promise<AdminUser | null> {
   try {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, remember }),
     });
     if (!res.ok) return null;
     const data = await res.json();

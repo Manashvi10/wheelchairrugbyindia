@@ -1,8 +1,33 @@
 "use client";
 
-import { Mail, Phone, MapPin, Send, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock, CheckCircle2, Loader2 } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useState, useEffect } from "react";
+
+interface HeroData { eyebrow: string; title: string; description: string; enabled: boolean; }
+interface FormCfg {
+  title: string; helper: string; submit_text: string; recipient_email: string;
+  reply_subject: string; reply_message: string; subjects: { value: string; label: string }[];
+  enabled: boolean;
+}
+interface DetailsData {
+  heading: string; hours_label: string; address: string; phone: string; phone_link: string;
+  email: string; email_link: string; office_hours: string; enabled: boolean;
+}
+interface SocialData {
+  heading: string; subtitle: string; links: { platform: string; url: string }[]; enabled: boolean;
+}
+interface MapCfg { title: string; embed_url: string; link_text: string; link_url: string; enabled: boolean; }
+interface FAQItem { q: string; a: string; }
+interface FAQCfg { title: string; items: FAQItem[]; enabled: boolean; }
+
+const SOCIAL_ICONS: Record<string, ({ className }: { className?: string }) => React.JSX.Element> = {
+  Facebook: FacebookIcon,
+  Twitter: TwitterIcon,
+  Instagram: InstagramIcon,
+  YouTube: YoutubeIcon,
+};
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
@@ -37,78 +62,183 @@ function YoutubeIcon({ className }: { className?: string }) {
 }
 
 export default function ContactPage() {
+  const [hero, setHero] = useState<HeroData>({
+    eyebrow: "Reach Out",
+    title: "Contact Us",
+    description: "Have questions? Want to volunteer, start a team, or partner with us? We'd love to hear from you.",
+    enabled: true,
+  });
+  const [form, setForm] = useState<FormCfg>({
+    title: "Send Us a Message",
+    helper: "Fill out the form below and our team will get back to you within 24–48 hours.",
+    submit_text: "Send Message",
+    recipient_email: "wcrfi.india@gmail.com",
+    reply_subject: "",
+    reply_message: "",
+    subjects: [
+      { value: "general", label: "General Inquiry" },
+      { value: "join", label: "Join / Register as Athlete" },
+      { value: "volunteer", label: "Volunteer" },
+      { value: "sponsor", label: "Sponsorship / Partnership" },
+      { value: "event", label: "Event Information" },
+      { value: "media", label: "Media / Press" },
+      { value: "other", label: "Other" },
+    ],
+    enabled: true,
+  });
+  const [details, setDetails] = useState<DetailsData>({
+    heading: "Contact Details",
+    hours_label: "Office Hours",
+    address: "House no 53 shivlok phase 4\nKhajurikalan Piplani Bhopal Madhya Pradesh 462022",
+    phone: "+91 7223051792",
+    phone_link: "tel:+917223051792",
+    email: "wcrfi.india@gmail.com",
+    email_link: "mailto:wcrfi.india@gmail.com",
+    office_hours: "Mon – Fri: 10:00 AM – 5:00 PM IST",
+    enabled: true,
+  });
+  const [social, setSocial] = useState<SocialData>({
+    heading: "Follow Us",
+    subtitle: "Stay connected for the latest updates, events, and stories.",
+    links: [
+      { platform: "Facebook", url: "https://www.facebook.com/WCRFI/" },
+      { platform: "Twitter", url: "https://x.com/rugby_india" },
+      { platform: "Instagram", url: "https://www.instagram.com/wcrugby_india/" },
+      { platform: "YouTube", url: "https://www.youtube.com/@WheelchairRugbyIndia" },
+    ],
+    enabled: true,
+  });
+  const [mapData, setMapData] = useState<MapCfg>({
+    title: "WRFI Office Location",
+    embed_url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3667.3!2d77.4!3d23.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDEyJzAwLjAiTiA3N8KwMjQnMDAuMCJF!5e0!3m2!1sen!2sin!4v1640000000000!5m2!1sen!2sin",
+    link_text: "Open in Maps",
+    link_url: "https://maps.google.com/?q=WRFI+Bhopal",
+    enabled: true,
+  });
+  const [faq, setFaq] = useState<FAQCfg>({
+    title: "Frequently Asked Questions",
+    items: [
+      { q: "How can I join WRFI as an athlete?", a: "Fill out the contact form above with your details, or email us at wcrfi.india@gmail.com." },
+      { q: "Does WRFI provide equipment and wheelchairs?", a: "Yes, WRFI provides rugby-specific wheelchairs and equipment to registered athletes." },
+      { q: "How can I volunteer or support WRFI?", a: "We're always looking for volunteers. Reach out through the contact form." },
+      { q: "How can my organization sponsor or partner with WRFI?", a: "Contact us with the 'Sponsorship / Partnership' subject for detailed information." },
+    ],
+    enabled: true,
+  });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/contact-sections");
+        const { sections } = await res.json();
+        if (sections) {
+          if (sections.hero?.data) setHero(sections.hero.data as HeroData);
+          if (sections.form?.data) setForm(sections.form.data as FormCfg);
+          if (sections.details?.data) setDetails(sections.details.data as DetailsData);
+          if (sections.social?.data) setSocial(sections.social.data as SocialData);
+          if (sections.map?.data) setMapData(sections.map.data as MapCfg);
+          if (sections.faq?.data) setFaq(sections.faq.data as FAQCfg);
+        }
+      } catch (e) {
+        console.error("Failed to load contact sections:", e);
+      }
+    })();
+  }, []);
+
+  const [submission, setSubmission] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [submitError, setSubmitError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitStatus("submitting");
+    setSubmitError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...submission, source: "contact" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSubmitStatus("error");
+        setSubmitError(data?.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+      setSubmitStatus("success");
+      setSubmission({ name: "", email: "", phone: "", subject: "", message: "" });
+      setTimeout(() => setSubmitStatus("idle"), 6000);
+    } catch {
+      setSubmitStatus("error");
+      setSubmitError("Network error. Please try again.");
+    }
+  };
+
   return (
     <>
       <Header />
       <main id="main-content">
         {/* Page Hero */}
-        <section className="relative pt-20 sm:pt-24 pb-16 sm:pb-20 bg-navy overflow-hidden">
-          <div className="pattern-overlay absolute inset-0" />
-          <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy-light/80 to-navy" />
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14">
-            <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
-              Reach Out
-            </span>
-            <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-              Contact <span className="gradient-text">Us</span>
-            </h1>
-            <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
-              Have questions? Want to volunteer, start a team, or partner with
-              us? We&apos;d love to hear from you.
-            </p>
-            <div className="section-divider mt-6" />
-          </div>
-        </section>
+        {hero.enabled && (
+          <section className="relative pt-20 sm:pt-24 pb-16 sm:pb-20 bg-navy overflow-hidden">
+            <div className="pattern-overlay absolute inset-0" />
+            <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy-light/80 to-navy" />
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14">
+              <span className="text-saffron font-semibold text-sm tracking-widest uppercase">
+                {hero.eyebrow}
+              </span>
+              <h1 className="mt-3 text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+                <span className="gradient-text">{hero.title}</span>
+              </h1>
+              <p className="mt-4 text-lg sm:text-xl text-white max-w-2xl leading-relaxed">
+                {hero.description}
+              </p>
+              <div className="section-divider mt-6" />
+            </div>
+          </section>
+        )}
 
         {/* Contact Content */}
         <section className="py-16 sm:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-5 gap-10 lg:gap-14">
               {/* Contact Form */}
+              {form.enabled && (
               <div className="lg:col-span-3">
                 <h2 className="text-2xl sm:text-3xl font-black text-navy mb-2">
-                  Send Us a Message
+                  {form.title}
                 </h2>
                 <p className="text-slate-500 mb-8">
-                  Fill out the form below and our team will get back to you
-                  within 24–48 hours.
+                  {form.helper}
                 </p>
 
                 <form
-                  onSubmit={(e) => e.preventDefault()}
+                  onSubmit={handleSubmit}
                   className="bg-slate-50 rounded-2xl border border-slate-100 p-6 sm:p-8 lg:p-10"
                   aria-label="Contact form"
                 >
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
-                      <label
-                        htmlFor="name"
-                        className="block text-sm font-semibold text-navy mb-2"
-                      >
+                      <label htmlFor="name" className="block text-sm font-semibold text-navy mb-2">
                         Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Your name"
-                        required
+                        type="text" id="name" name="name"
+                        value={submission.name}
+                        onChange={(e) => setSubmission({ ...submission, name: e.target.value })}
+                        placeholder="Your name" required
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-navy placeholder:text-slate-400 focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none"
                       />
                     </div>
                     <div>
-                      <label
-                        htmlFor="email"
-                        className="block text-sm font-semibold text-navy mb-2"
-                      >
+                      <label htmlFor="email" className="block text-sm font-semibold text-navy mb-2">
                         Email Address <span className="text-red-500">*</span>
                       </label>
                       <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="you@example.com"
-                        required
+                        type="email" id="email" name="email"
+                        value={submission.email}
+                        onChange={(e) => setSubmission({ ...submission, email: e.target.value })}
+                        placeholder="you@example.com" required
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-navy placeholder:text-slate-400 focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none"
                       />
                     </div>
@@ -116,78 +246,82 @@ export default function ContactPage() {
 
                   <div className="grid sm:grid-cols-2 gap-5 mt-5">
                     <div>
-                      <label
-                        htmlFor="phone"
-                        className="block text-sm font-semibold text-navy mb-2"
-                      >
+                      <label htmlFor="phone" className="block text-sm font-semibold text-navy mb-2">
                         Phone Number
                       </label>
                       <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
+                        type="tel" id="phone" name="phone"
+                        value={submission.phone}
+                        onChange={(e) => setSubmission({ ...submission, phone: e.target.value })}
                         placeholder="+91 98765 43210"
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-navy placeholder:text-slate-400 focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none"
                       />
                     </div>
                     <div>
-                      <label
-                        htmlFor="subject"
-                        className="block text-sm font-semibold text-navy mb-2"
-                      >
+                      <label htmlFor="subject" className="block text-sm font-semibold text-navy mb-2">
                         Subject <span className="text-red-500">*</span>
                       </label>
                       <select
-                        id="subject"
-                        name="subject"
-                        required
+                        id="subject" name="subject" required
+                        value={submission.subject}
+                        onChange={(e) => setSubmission({ ...submission, subject: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-navy focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none"
                       >
                         <option value="">Select a topic</option>
-                        <option value="general">General Inquiry</option>
-                        <option value="join">Join / Register as Athlete</option>
-                        <option value="volunteer">Volunteer</option>
-                        <option value="sponsor">Sponsorship / Partnership</option>
-                        <option value="event">Event Information</option>
-                        <option value="media">Media / Press</option>
-                        <option value="other">Other</option>
+                        {form.subjects.map((s) => (
+                          <option key={s.value} value={s.label}>{s.label}</option>
+                        ))}
                       </select>
                     </div>
                   </div>
 
                   <div className="mt-5">
-                    <label
-                      htmlFor="message"
-                      className="block text-sm font-semibold text-navy mb-2"
-                    >
+                    <label htmlFor="message" className="block text-sm font-semibold text-navy mb-2">
                       Message <span className="text-red-500">*</span>
                     </label>
                     <textarea
-                      id="message"
-                      name="message"
-                      rows={6}
-                      placeholder="Tell us how we can help..."
-                      required
+                      id="message" name="message" rows={6}
+                      value={submission.message}
+                      onChange={(e) => setSubmission({ ...submission, message: e.target.value })}
+                      placeholder="Tell us how we can help..." required
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-navy placeholder:text-slate-400 focus:border-saffron focus:ring-2 focus:ring-saffron/20 transition-all outline-none resize-y"
                     />
                   </div>
 
+                  {submitStatus === "success" && (
+                    <div className="mt-5 flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium">
+                      <CheckCircle2 className="w-5 h-5 shrink-0" />
+                      Thank you! Your message has been sent successfully.
+                    </div>
+                  )}
+                  {submitStatus === "error" && (
+                    <div className="mt-5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
+                      {submitError || "Something went wrong. Please try again."}
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    className="mt-6 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-saffron hover:bg-saffron-dark text-white font-bold rounded-full text-lg transition-all hover:shadow-lg hover:shadow-saffron/30 pulse-cta"
+                    disabled={submitStatus === "submitting"}
+                    className="mt-6 w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-saffron hover:bg-saffron-dark text-white font-bold rounded-full text-lg transition-all hover:shadow-lg hover:shadow-saffron/30 pulse-cta disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <Send className="w-5 h-5" />
-                    Send Message
+                    {submitStatus === "submitting" ? (
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Sending…</>
+                    ) : (
+                      <><Send className="w-5 h-5" /> {form.submit_text}</>
+                    )}
                   </button>
                 </form>
               </div>
+              )}
 
               {/* Contact Info Sidebar */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Contact details */}
+                {details.enabled && (
                 <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6 sm:p-8">
                   <h3 className="text-xl font-bold text-navy mb-6">
-                    Contact Details
+                    {details.heading}
                   </h3>
                   <div className="space-y-5">
                     <div className="flex items-start gap-4">
@@ -196,10 +330,8 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-navy">Address</p>
-                        <p className="text-slate-500 text-sm mt-0.5">
-                          House no 53 shivlok phase 4
-                          <br />
-                          Khajurikalan Piplani Bhopal Madhya Pradesh 462022
+                        <p className="text-slate-500 text-sm mt-0.5 whitespace-pre-line">
+                          {details.address}
                         </p>
                       </div>
                     </div>
@@ -210,10 +342,10 @@ export default function ContactPage() {
                       <div>
                         <p className="text-sm font-semibold text-navy">Phone</p>
                         <a
-                          href="tel:+917223051792"
+                          href={details.phone_link}
                           className="text-slate-500 text-sm hover:text-saffron transition-colors"
                         >
-                          +91 7223051792
+                          {details.phone}
                         </a>
                       </div>
                     </div>
@@ -224,10 +356,10 @@ export default function ContactPage() {
                       <div>
                         <p className="text-sm font-semibold text-navy">Email</p>
                         <a
-                          href="mailto:wcrfi.india@gmail.com"
+                          href={details.email_link}
                           className="text-slate-500 text-sm hover:text-saffron transition-colors"
                         >
-                          wcrfi.india@gmail.com
+                          {details.email}
                         </a>
                       </div>
                     </div>
@@ -236,50 +368,51 @@ export default function ContactPage() {
                         <Clock className="w-5 h-5 text-gold" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-navy">Office Hours</p>
+                        <p className="text-sm font-semibold text-navy">{details.hours_label}</p>
                         <p className="text-slate-500 text-sm mt-0.5">
-                          Mon – Fri: 10:00 AM – 5:00 PM IST
+                          {details.office_hours}
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
+                )}
 
                 {/* Social Media */}
+                {social.enabled && (
                 <div className="bg-slate-50 rounded-2xl border border-slate-100 p-6 sm:p-8">
                   <h3 className="text-xl font-bold text-navy mb-4">
-                    Follow Us
+                    {social.heading}
                   </h3>
                   <p className="text-slate-500 text-sm mb-4">
-                    Stay connected for the latest updates, events, and stories.
+                    {social.subtitle}
                   </p>
-                  <div className="flex gap-3">
-                    {[
-                      { icon: FacebookIcon, label: "Facebook", href: "https://www.facebook.com/WCRFI/" },
-                      { icon: TwitterIcon, label: "Twitter", href: "https://x.com/rugby_india" },
-                      { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/wcrugby_india/" },
-                      { icon: YoutubeIcon, label: "YouTube", href: "https://www.youtube.com/@WheelchairRugbyIndia" },
-                    ].map((social, i) => {
-                      const Icon = social.icon;
+                  <div className="flex gap-3 flex-wrap">
+                    {social.links.map((s, i) => {
+                      const Icon = SOCIAL_ICONS[s.platform];
                       return (
                         <a
                           key={i}
-                          href={social.href}
-                          aria-label={social.label}
+                          href={s.url}
+                          aria-label={s.platform}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-saffron hover:text-white hover:border-saffron transition-all"
                         >
-                          <Icon className="w-5 h-5" />
+                          {Icon ? <Icon className="w-5 h-5" /> : <span className="text-xs font-bold">{s.platform.slice(0, 2)}</span>}
                         </a>
                       );
                     })}
                   </div>
                 </div>
+                )}
 
-                {/* Map placeholder */}
+                {/* Map */}
+                {mapData.enabled && (
                 <div className="rounded-2xl overflow-hidden border border-slate-100 h-[220px] bg-slate-100 relative">
                   <iframe
-                    title="WRFI Office Location"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3667.3!2d77.4!3d23.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDEyJzAwLjAiTiA3N8KwMjQnMDAuMCJF!5e0!3m2!1sen!2sin!4v1640000000000!5m2!1sen!2sin"
+                    title={mapData.title}
+                    src={mapData.embed_url}
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -288,58 +421,44 @@ export default function ContactPage() {
                     referrerPolicy="no-referrer-when-downgrade"
                   />
                 </div>
+                )}
               </div>
             </div>
           </div>
         </section>
 
         {/* FAQ / Quick help */}
+        {faq.enabled && (
         <section className="py-16 sm:py-20 bg-slate-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-black text-navy">
-                Frequently Asked Questions
+                {faq.title}
               </h2>
               <div className="section-divider mx-auto mt-4" />
             </div>
 
             <div className="space-y-4">
-              {[
-                {
-                  q: "How can I join WRFI as an athlete?",
-                  a: "Fill out the contact form above with your details, or email us at wcrfi.india@gmail.com. We welcome athletes with physical disabilities from all states of India.",
-                },
-                {
-                  q: "Does WRFI provide equipment and wheelchairs?",
-                  a: "Yes, WRFI provides rugby-specific wheelchairs and equipment to registered athletes through our equipment support programs.",
-                },
-                {
-                  q: "How can I volunteer or support WRFI?",
-                  a: "We're always looking for volunteers, coaches, and supporters. Reach out through the contact form or email us to learn about opportunities.",
-                },
-                {
-                  q: "How can my organization sponsor or partner with WRFI?",
-                  a: "We offer multiple sponsorship and partnership tiers. Contact us with the 'Sponsorship / Partnership' subject for detailed information.",
-                },
-              ].map((faq, i) => (
+              {faq.items.map((item, i) => (
                 <details
                   key={i}
                   className="group bg-white rounded-2xl border border-slate-100 overflow-hidden"
                 >
                   <summary className="flex items-center justify-between cursor-pointer px-6 py-5 text-navy font-bold hover:text-saffron transition-colors list-none">
-                    {faq.q}
+                    {item.q}
                     <span className="text-saffron ml-4 group-open:rotate-45 transition-transform text-xl font-bold">
                       +
                     </span>
                   </summary>
                   <div className="px-6 pb-5 text-slate-600 text-sm leading-relaxed">
-                    {faq.a}
+                    {item.a}
                   </div>
                 </details>
               ))}
             </div>
           </div>
         </section>
+        )}
       </main>
       <Footer />
     </>

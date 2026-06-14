@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Image as ImageIcon,
   Clock,
@@ -22,19 +22,185 @@ import { PageHeader, Card, Button, Field, Input, Textarea, Toggle, Badge } from 
 const TABS = [
   { id: "hero", label: "Page Hero", icon: ImageIcon },
   { id: "timeline", label: "Journey Timeline", icon: Clock },
-  { id: "nationals", label: "Para Nationals", icon: Trophy },
-  { id: "internationals", label: "Para Internationals", icon: Globe },
-  { id: "summary", label: "Summary Strip", icon: TrendingUp },
 ];
+
+interface TimelineEntry {
+  year: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+}
+
+interface HeroData {
+  eyebrow: string;
+  title: string;
+  description: string;
+  enabled: boolean;
+}
+
+interface TimelineData {
+  eyebrow: string;
+  title: string;
+  entries: TimelineEntry[];
+  enabled: boolean;
+}
+
+interface NationalEvent {
+  year: string;
+  title: string;
+  location: string;
+  teams: string;
+  winner: string;
+}
+
+interface NationalsData {
+  eyebrow: string;
+  title: string;
+  description: string;
+  events: NationalEvent[];
+  enabled: boolean;
+}
+
+interface InternationalEvent {
+  year: string;
+  title: string;
+  location: string;
+  result: string;
+  type: string;
+}
+
+interface InternationalsData {
+  eyebrow: string;
+  title: string;
+  description: string;
+  events: InternationalEvent[];
+  enabled: boolean;
+}
+
+interface SummaryStatItem {
+  icon: string;
+  value: string;
+  label: string;
+}
+
+interface SummaryData {
+  stats: SummaryStatItem[];
+  enabled: boolean;
+}
+
+const DEFAULT_HERO: HeroData = {
+  eyebrow: "Our Story",
+  title: "History of WRFI",
+  description: "From humble beginnings to national recognition — the journey of wheelchair rugby in India.",
+  enabled: true,
+};
+
+const DEFAULT_TIMELINE: TimelineData = {
+  eyebrow: "The Journey",
+  title: "Our Milestones",
+  enabled: true,
+  entries: [
+    { year: "2017", title: "Foundation", description: "WRFI was established to promote wheelchair rugby in India.", icon: "Rocket", color: "saffron" },
+    { year: "2019", title: "First National Championship", description: "Hosted the inaugural national championship with 8 state teams.", icon: "Trophy", color: "india-green" },
+    { year: "2021", title: "International Recognition", description: "Gained official recognition from IWRF (International Wheelchair Rugby Federation).", icon: "Globe", color: "blue-accent" },
+    { year: "2023", title: "Growth & Expansion", description: "Expanded to 18+ states with dedicated training programs.", icon: "TrendingUp", color: "gold" },
+    { year: "2025", title: "Future Vision", description: "Aiming for Paralympic qualification and nationwide grassroots development.", icon: "Target", color: "saffron" },
+  ],
+};
+
+const DEFAULT_NATIONALS: NationalsData = {
+  eyebrow: "Across India",
+  title: "National Championships",
+  description: "A history of our national tournaments and champions.",
+  enabled: true,
+  events: [
+    { year: "2019", title: "1st National Championship", location: "New Delhi", teams: "8 State Teams", winner: "Maharashtra" },
+    { year: "2020", title: "2nd National Championship", location: "Bengaluru", teams: "12 State Teams", winner: "Delhi" },
+    { year: "2022", title: "3rd National Championship", location: "Chennai", teams: "16 State Teams", winner: "Punjab" },
+    { year: "2023", title: "4th National Championship", location: "Hyderabad", teams: "18 State Teams", winner: "Maharashtra" },
+    { year: "2024", title: "5th National Championship", location: "Kolkata", teams: "20 State Teams", winner: "Delhi" },
+  ],
+};
+
+const DEFAULT_INTERNATIONALS: InternationalsData = {
+  eyebrow: "Global Stage",
+  title: "International Participation",
+  description: "Team India's journey on the world stage.",
+  enabled: true,
+  events: [
+    { year: "2024", title: "Asia-Oceania Championship", location: "Bangkok, Thailand", result: "Participation & Experience", type: "Continental" },
+    { year: "2024", title: "IWRF Development Tournament", location: "Dubai, UAE", result: "4th Place", type: "Development" },
+    { year: "2025", title: "Asia-Oceania Qualifiers", location: "Tokyo, Japan", result: "Bronze Medal", type: "Qualifiers" },
+  ],
+};
+
+const DEFAULT_SUMMARY: SummaryData = {
+  enabled: true,
+  stats: [
+    { icon: "Calendar", value: "8+", label: "Years of Growth" },
+    { icon: "Users", value: "22+", label: "State Teams" },
+    { icon: "Trophy", value: "5", label: "National Championships" },
+    { icon: "Globe", value: "3", label: "International Events" },
+  ],
+};
 
 export default function HistoryPageCMS() {
   const [active, setActive] = useState("hero");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [hero, setHero] = useState<HeroData>(DEFAULT_HERO);
+  const [timeline, setTimeline] = useState<TimelineData>(DEFAULT_TIMELINE);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/history-sections");
+        const { sections } = await res.json();
+        if (sections) {
+          if (sections.hero?.data) setHero(sections.hero.data as HeroData);
+          if (sections.timeline?.data) setTimeline(sections.timeline.data as TimelineData);
+        }
+      } catch (e) {
+        console.error("Failed to load history sections:", e);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const saveAll = async () => {
+    setSaving(true);
+    try {
+      const payloads = [
+        { section_key: "hero", data: hero, is_enabled: hero.enabled },
+        { section_key: "timeline", data: timeline, is_enabled: timeline.enabled },
+      ];
+      for (const p of payloads) {
+        await fetch("/api/history-sections", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(p),
+        });
+      }
+      alert("Changes saved successfully!");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to save changes");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="History Page CMS"
-        subtitle="Manage Our History & Achievements page sections."
+        subtitle="Manage the History & Journey page sections."
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
           { label: "Website Management" },
@@ -42,11 +208,11 @@ export default function HistoryPageCMS() {
         ]}
         actions={
           <>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => window.open("/history", "_blank")}>
               <Eye className="w-4 h-4" /> Preview
             </Button>
-            <Button variant="primary">
-              <Save className="w-4 h-4" /> Save Changes
+            <Button variant="primary" onClick={saveAll} disabled={saving}>
+              <Save className="w-4 h-4" /> {saving ? "Saving..." : "Save Changes"}
             </Button>
           </>
         }
@@ -66,16 +232,12 @@ export default function HistoryPageCMS() {
                   <button
                     onClick={() => setActive(t.id)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition ${
-                      isActive
-                        ? "bg-saffron text-white font-semibold shadow"
-                        : "text-slate-700 hover:bg-slate-100"
+                      isActive ? "bg-saffron text-white font-semibold shadow" : "text-slate-700 hover:bg-slate-100"
                     }`}
                   >
-                    <span
-                      className={`w-5 h-5 rounded text-[10px] font-bold flex items-center justify-center ${
-                        isActive ? "bg-white/20" : "bg-slate-100 text-slate-500"
-                      }`}
-                    >
+                    <span className={`w-5 h-5 rounded text-[10px] font-bold flex items-center justify-center ${
+                      isActive ? "bg-white/20" : "bg-slate-100 text-slate-500"
+                    }`}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -88,28 +250,15 @@ export default function HistoryPageCMS() {
         </Card>
 
         <div className="space-y-6 min-w-0">
-          {active === "hero" && <HeroSection />}
-          {active === "timeline" && <TimelineSection />}
-          {active === "nationals" && <NationalsSection />}
-          {active === "internationals" && <InternationalsSection />}
-          {active === "summary" && <SummarySection />}
+          {active === "hero" && <HeroSection data={hero} setData={setHero} />}
+          {active === "timeline" && <TimelineSection data={timeline} setData={setTimeline} />}
         </div>
       </div>
     </div>
   );
 }
 
-function SectionToggleHeader({
-  title,
-  description,
-  enabled,
-  onToggle,
-}: {
-  title: string;
-  description: string;
-  enabled: boolean;
-  onToggle: (v: boolean) => void;
-}) {
+function SectionToggleHeader({ title, description, enabled, onToggle }: { title: string; description: string; enabled: boolean; onToggle: (v: boolean) => void; }) {
   return (
     <div className="flex items-start justify-between gap-4 px-5 sm:px-6 py-4 border-b border-slate-100">
       <div>
@@ -124,44 +273,22 @@ function SectionToggleHeader({
   );
 }
 
-function ImageUploader({ label }: { label: string }) {
-  return (
-    <div>
-      <label className="block text-xs font-semibold text-slate-700 mb-1.5">{label}</label>
-      <div className="aspect-video bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-center p-6 hover:border-saffron hover:bg-orange-50/30 transition cursor-pointer">
-        <Upload className="w-8 h-8 text-slate-400 mb-2" />
-        <div className="text-sm font-semibold text-slate-700">Drop image here or click to upload</div>
-        <div className="text-xs text-slate-400 mt-1">PNG, JPG, WEBP up to 5 MB</div>
-      </div>
-    </div>
-  );
-}
+/* ────────────────  SECTIONS  ──────────────── */
 
-/* ────────────────────────────────  SECTIONS  ──────────────────────────────── */
-
-function HeroSection() {
-  const [enabled, setEnabled] = useState(true);
+function HeroSection({ data, setData }: { data: HeroData; setData: (d: HeroData) => void }) {
   return (
     <Card>
-      <SectionToggleHeader
-        title="Page Hero"
-        description="Top banner of the History page."
-        enabled={enabled}
-        onToggle={setEnabled}
-      />
+      <SectionToggleHeader title="Page Hero" description="Top banner of the History page." enabled={data.enabled} onToggle={(v) => setData({ ...data, enabled: v })} />
       <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
         <Field label="Eyebrow Label">
-          <Input defaultValue="Our Legacy" />
+          <Input value={data.eyebrow} onChange={(e) => setData({ ...data, eyebrow: e.target.value })} />
         </Field>
         <Field label="Hero Title" required>
-          <Input defaultValue="Our History & Achievements" />
+          <Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} />
         </Field>
         <div className="md:col-span-2">
           <Field label="Description">
-            <Textarea
-              rows={3}
-              defaultValue="From 1977 to today — the story of wheelchair rugby and India's remarkable journey in the sport."
-            />
+            <Textarea rows={3} value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} />
           </Field>
         </div>
       </div>
@@ -169,127 +296,63 @@ function HeroSection() {
   );
 }
 
-function TimelineSection() {
-  const [enabled, setEnabled] = useState(true);
-  const entries = [
-    { year: "1977", title: "Sport Invented", icon: "Flag", color: "saffron", description: "Wheelchair rugby was invented in Winnipeg, Canada by quadriplegic athletes seeking an inclusive competitive sport." },
-    { year: "1993", title: "IWRF Established", icon: "Globe", color: "blue", description: "The International Wheelchair Rugby Federation was formed to govern the sport globally." },
-    { year: "1996", title: "Paralympic Debut", icon: "Trophy", color: "green", description: "Wheelchair rugby featured as a demonstration sport at the Atlanta Paralympics." },
-    { year: "2000", title: "Full Medal Sport", icon: "Medal", color: "gold", description: "Became an official medal sport at the Sydney 2000 Paralympic Games." },
-    { year: "2009", title: "Introduced in India", icon: "Flag", color: "saffron", description: "Wheelchair rugby was introduced in India, igniting a new chapter in Indian para-sports history." },
-    { year: "2019", title: "WRFI Established", icon: "Star", color: "blue", description: "Wheelchair Rugby Federation of India was officially formed as the national governing body." },
-    { year: "2024", title: "International Debut", icon: "Globe", color: "green", description: "Team India competed in its first international wheelchair rugby tournament on the global stage." },
-  ];
+function TimelineSection({ data, setData }: { data: TimelineData; setData: (d: TimelineData) => void }) {
+  const update = (i: number, field: keyof TimelineEntry, val: string) => {
+    const entries = data.entries.map((s, idx) => idx === i ? { ...s, [field]: val } : s);
+    setData({ ...data, entries });
+  };
+  const move = (i: number, dir: -1 | 1) => {
+    const arr = [...data.entries];
+    const j = i + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    setData({ ...data, entries: arr });
+  };
   return (
     <Card>
-      <SectionToggleHeader
-        title="Journey Timeline — The Journey of Wheelchair Rugby"
-        description="Vertical timeline of milestones from 1977 to today."
-        enabled={enabled}
-        onToggle={setEnabled}
-      />
+      <SectionToggleHeader title="Journey Timeline" description="Milestones in WRFI's journey." enabled={data.enabled} onToggle={(v) => setData({ ...data, enabled: v })} />
       <div className="p-5 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <Field label="Section Eyebrow">
-            <Input defaultValue="Milestones" />
+            <Input value={data.eyebrow} onChange={(e) => setData({ ...data, eyebrow: e.target.value })} />
           </Field>
           <Field label="Section Title">
-            <Input defaultValue="The Journey of Wheelchair Rugby" />
+            <Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} />
           </Field>
         </div>
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-slate-500">{entries.length} milestones</p>
-          <Button variant="secondary" size="sm">
+          <p className="text-sm text-slate-500">{data.entries.length} milestones</p>
+          <Button variant="secondary" size="sm" onClick={() => setData({ ...data, entries: [...data.entries, { year: "", title: "", description: "", icon: "Star", color: "saffron" }] })}>
             <Plus className="w-3.5 h-3.5" /> Add Milestone
           </Button>
         </div>
-        <ul className="space-y-2">
-          {entries.map((e) => (
-            <li key={e.year} className="flex items-center gap-3 border border-slate-200 rounded-xl p-3 hover:border-saffron transition">
-              <GripVertical className="w-4 h-4 text-slate-300 cursor-grab" />
-              <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-saffron to-orange-600 text-white flex items-center justify-center font-bold shrink-0">
-                {e.year}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm text-slate-800">{e.title}</div>
-                <div className="text-xs text-slate-500 truncate">{e.description}</div>
-                <div className="text-[10px] text-slate-400 mt-0.5">Icon: {e.icon} · Color: {e.color}</div>
-              </div>
-              <div className="flex items-center gap-1">
-                <button className="p-2 text-slate-400 hover:text-slate-700"><ChevronUp className="w-3.5 h-3.5" /></button>
-                <button className="p-2 text-slate-400 hover:text-slate-700"><ChevronDown className="w-3.5 h-3.5" /></button>
-                <button className="p-2 text-slate-400 hover:text-saffron"><Edit3 className="w-3.5 h-3.5" /></button>
-                <button className="p-2 text-slate-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </Card>
-  );
-}
-
-function NationalsSection() {
-  const [enabled, setEnabled] = useState(true);
-  const items = [
-    { event: "1st National Wheelchair Rugby Championship", year: "2019", location: "New Delhi", result: "8 State Teams — Maharashtra Gold" },
-    { event: "2nd National Wheelchair Rugby Championship", year: "2020", location: "Bengaluru", result: "12 State Teams — Delhi Gold" },
-    { event: "3rd National Wheelchair Rugby Championship", year: "2022", location: "Chennai", result: "16 State Teams — Punjab Gold" },
-    { event: "4th National Wheelchair Rugby Championship", year: "2023", location: "Hyderabad", result: "18 State Teams — Maharashtra Gold" },
-    { event: "5th National Wheelchair Rugby Championship", year: "2024", location: "Kolkata", result: "20 State Teams — Delhi Gold" },
-    { event: "6th National Wheelchair Rugby Championship", year: "2025", location: "Mumbai", result: "22 State Teams — Results Pending" },
-  ];
-  return (
-    <Card>
-      <SectionToggleHeader
-        title="Our Achievements — Para Nationals"
-        description="Cards of National Wheelchair Rugby Championship editions."
-        enabled={enabled}
-        onToggle={setEnabled}
-      />
-      <div className="p-5 sm:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-          <Field label="Section Eyebrow">
-            <Input defaultValue="National Glory" />
-          </Field>
-          <Field label="Section Title">
-            <Input defaultValue="Our Achievements — Para Nationals" />
-          </Field>
-          <div className="md:col-span-2">
-            <Field label="Section Description">
-              <Textarea rows={2} defaultValue="A record of excellence at the National Wheelchair Rugby Championships organized by WRFI across India." />
-            </Field>
-          </div>
-        </div>
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-slate-500">{items.length} championships</p>
-          <Button variant="secondary" size="sm">
-            <Plus className="w-3.5 h-3.5" /> Add Championship
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {items.map((it, i) => (
+        <div className="space-y-3">
+          {data.entries.map((e, i) => (
             <div key={i} className="border border-slate-200 rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <Badge color="orange">{it.year}</Badge>
+                <Badge color="slate">Milestone #{i + 1}</Badge>
                 <div className="flex items-center gap-1">
-                  <button className="p-1.5 text-slate-400 hover:text-saffron"><Edit3 className="w-3.5 h-3.5" /></button>
-                  <button className="p-1.5 text-slate-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => move(i, -1)} className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronUp className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => move(i, 1)} className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronDown className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setData({ ...data, entries: data.entries.filter((_, j) => j !== i) })} className="p-1.5 text-slate-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
-              <Field label="Event Name" required>
-                <Input defaultValue={it.event} />
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Year">
-                  <Input defaultValue={it.year} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Field label="Year" required>
+                  <Input value={e.year} onChange={(ev) => update(i, "year", ev.target.value)} />
                 </Field>
-                <Field label="Location">
-                  <Input defaultValue={it.location} />
+                <Field label="Icon" hint="Rocket, Trophy, Globe, etc.">
+                  <Input value={e.icon} onChange={(ev) => update(i, "icon", ev.target.value)} />
+                </Field>
+                <Field label="Color" hint="saffron, india-green, blue-accent, gold">
+                  <Input value={e.color} onChange={(ev) => update(i, "color", ev.target.value)} />
                 </Field>
               </div>
-              <Field label="Result">
-                <Input defaultValue={it.result} />
+              <Field label="Title" required>
+                <Input value={e.title} onChange={(ev) => update(i, "title", ev.target.value)} />
+              </Field>
+              <Field label="Description">
+                <Textarea rows={2} value={e.description} onChange={(ev) => update(i, "description", ev.target.value)} />
               </Field>
             </div>
           ))}
@@ -299,65 +362,118 @@ function NationalsSection() {
   );
 }
 
-function InternationalsSection() {
-  const [enabled, setEnabled] = useState(true);
-  const items = [
-    { event: "Asia-Oceania Wheelchair Rugby Championship", year: "2024", location: "Bangkok, Thailand", result: "Team India — Participation & Experience" },
-    { event: "IWRF Development Tournament", year: "2024", location: "Dubai, UAE", result: "Team India — 4th Place" },
-    { event: "Asia-Oceania Qualifiers", year: "2025", location: "Tokyo, Japan", result: "Team India — Bronze Medal" },
-    { event: "IWRF World Championship Qualifiers", year: "2026", location: "Sydney, Australia", result: "Team India — Qualified (Upcoming)" },
-  ];
+function NationalsSection({ data, setData }: { data: NationalsData; setData: (d: NationalsData) => void }) {
+  const update = (i: number, field: keyof NationalEvent, val: string) => {
+    const events = data.events.map((s, idx) => idx === i ? { ...s, [field]: val } : s);
+    setData({ ...data, events });
+  };
   return (
     <Card>
-      <SectionToggleHeader
-        title="Our Achievements — Para Internationals"
-        description="International tournaments where Team India has competed."
-        enabled={enabled}
-        onToggle={setEnabled}
-      />
+      <SectionToggleHeader title="Para Nationals" description="National championship history table." enabled={data.enabled} onToggle={(v) => setData({ ...data, enabled: v })} />
       <div className="p-5 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <Field label="Section Eyebrow">
-            <Input defaultValue="Global Stage" />
+            <Input value={data.eyebrow} onChange={(e) => setData({ ...data, eyebrow: e.target.value })} />
           </Field>
           <Field label="Section Title">
-            <Input defaultValue="Our Achievements — Para Internationals" />
+            <Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} />
           </Field>
           <div className="md:col-span-2">
             <Field label="Section Description">
-              <Textarea rows={2} defaultValue="India's growing presence on the international wheelchair rugby stage — competing, learning, and earning respect worldwide." />
+              <Textarea rows={2} value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} />
             </Field>
           </div>
         </div>
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-slate-500">{items.length} international events</p>
-          <Button variant="secondary" size="sm">
-            <Plus className="w-3.5 h-3.5" /> Add International Event
+          <p className="text-sm text-slate-500">{data.events.length} championships</p>
+          <Button variant="secondary" size="sm" onClick={() => setData({ ...data, events: [...data.events, { year: "", title: "", location: "", teams: "", winner: "" }] })}>
+            <Plus className="w-3.5 h-3.5" /> Add Row
+          </Button>
+        </div>
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-slate-50 text-slate-600">
+              <tr>
+                <th className="px-3 py-2 font-semibold">Year</th>
+                <th className="px-3 py-2 font-semibold">Event</th>
+                <th className="px-3 py-2 font-semibold">Location</th>
+                <th className="px-3 py-2 font-semibold">Teams</th>
+                <th className="px-3 py-2 font-semibold">Winner</th>
+                <th className="px-3 py-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.events.map((r, i) => (
+                <tr key={i} className="border-t border-slate-100">
+                  <td className="px-3 py-2 w-24"><Input value={r.year} onChange={(e) => update(i, "year", e.target.value)} /></td>
+                  <td className="px-3 py-2"><Input value={r.title} onChange={(e) => update(i, "title", e.target.value)} /></td>
+                  <td className="px-3 py-2"><Input value={r.location} onChange={(e) => update(i, "location", e.target.value)} /></td>
+                  <td className="px-3 py-2"><Input value={r.teams} onChange={(e) => update(i, "teams", e.target.value)} /></td>
+                  <td className="px-3 py-2"><Input value={r.winner} onChange={(e) => update(i, "winner", e.target.value)} /></td>
+                  <td className="px-3 py-2 w-10">
+                    <button onClick={() => setData({ ...data, events: data.events.filter((_, j) => j !== i) })} className="p-2 text-slate-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function InternationalsSection({ data, setData }: { data: InternationalsData; setData: (d: InternationalsData) => void }) {
+  const update = (i: number, field: keyof InternationalEvent, val: string) => {
+    const events = data.events.map((s, idx) => idx === i ? { ...s, [field]: val } : s);
+    setData({ ...data, events });
+  };
+  return (
+    <Card>
+      <SectionToggleHeader title="Para Internationals" description="Team India's international participation." enabled={data.enabled} onToggle={(v) => setData({ ...data, enabled: v })} />
+      <div className="p-5 sm:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <Field label="Section Eyebrow">
+            <Input value={data.eyebrow} onChange={(e) => setData({ ...data, eyebrow: e.target.value })} />
+          </Field>
+          <Field label="Section Title">
+            <Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} />
+          </Field>
+          <div className="md:col-span-2">
+            <Field label="Section Description">
+              <Textarea rows={2} value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} />
+            </Field>
+          </div>
+        </div>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-slate-500">{data.events.length} international events</p>
+          <Button variant="secondary" size="sm" onClick={() => setData({ ...data, events: [...data.events, { year: "", title: "", location: "", result: "", type: "" }] })}>
+            <Plus className="w-3.5 h-3.5" /> Add Event
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {items.map((it, i) => (
+          {data.events.map((it, i) => (
             <div key={i} className="border border-slate-200 rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <Badge color="blue">{it.year}</Badge>
-                <div className="flex items-center gap-1">
-                  <button className="p-1.5 text-slate-400 hover:text-saffron"><Edit3 className="w-3.5 h-3.5" /></button>
-                  <button className="p-1.5 text-slate-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
-                </div>
+                <Badge color="blue">{it.year || "—"} · {it.type || "—"}</Badge>
+                <button onClick={() => setData({ ...data, events: data.events.filter((_, j) => j !== i) })} className="p-1.5 text-slate-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
-              <Field label="Event Name" required>
-                <Input defaultValue={it.event} />
+              <Field label="Event Title" required>
+                <Input value={it.title} onChange={(e) => update(i, "title", e.target.value)} />
               </Field>
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Year">
-                  <Input defaultValue={it.year} />
+                  <Input value={it.year} onChange={(e) => update(i, "year", e.target.value)} />
                 </Field>
-                <Field label="Location">
-                  <Input defaultValue={it.location} />
+                <Field label="Type">
+                  <Input value={it.type} onChange={(e) => update(i, "type", e.target.value)} />
                 </Field>
               </div>
+              <Field label="Location">
+                <Input value={it.location} onChange={(e) => update(i, "location", e.target.value)} />
+              </Field>
               <Field label="Result">
-                <Input defaultValue={it.result} />
+                <Input value={it.result} onChange={(e) => update(i, "result", e.target.value)} />
               </Field>
             </div>
           ))}
@@ -367,65 +483,38 @@ function InternationalsSection() {
   );
 }
 
-function SummarySection() {
-  const [enabled, setEnabled] = useState(true);
-  const [stats, setStats] = useState([
-    { value: "4+", label: "International Events" },
-    { value: "1", label: "Bronze Medal" },
-    { value: "2026", label: "World Qualifiers" },
-  ]);
+function SummarySection({ data, setData }: { data: SummaryData; setData: (d: SummaryData) => void }) {
+  const update = (i: number, field: keyof SummaryStatItem, val: string) => {
+    const stats = data.stats.map((s, idx) => idx === i ? { ...s, [field]: val } : s);
+    setData({ ...data, stats });
+  };
   return (
     <Card>
-      <SectionToggleHeader
-        title='"India is on the Rise" — Summary Strip'
-        description="Closing CTA strip with three quick stats at the bottom of the History page."
-        enabled={enabled}
-        onToggle={setEnabled}
-      />
-      <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-        <Field label="Strip Title" required>
-          <Input defaultValue="India is on the Rise" />
-        </Field>
-        <Field label="Background Style">
-          <Input defaultValue="navy-gradient" />
-        </Field>
-        <div className="md:col-span-2">
-          <Field label="Description">
-            <Textarea
-              rows={3}
-              defaultValue="From our first international appearance to earning medals — the journey has just begun. Support Team India as we aim for the Paralympic Games."
-            />
-          </Field>
+      <SectionToggleHeader title="Summary Strip" description="Quick stats shown at the bottom of the page." enabled={data.enabled} onToggle={(v) => setData({ ...data, enabled: v })} />
+      <div className="p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-slate-500">{data.stats.length} stat tiles</p>
+          <Button variant="secondary" size="sm" onClick={() => setData({ ...data, stats: [...data.stats, { icon: "Star", value: "0", label: "New" }] })}>
+            <Plus className="w-3.5 h-3.5" /> Add Stat
+          </Button>
         </div>
-        <div className="md:col-span-2">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-slate-700">Quick Stats</p>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setStats([...stats, { value: "0", label: "New Stat" }])}
-            >
-              <Plus className="w-3.5 h-3.5" /> Add Stat
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {stats.map((s, i) => (
-              <div key={i} className="border border-slate-200 rounded-xl p-3 space-y-2 relative">
-                <button
-                  onClick={() => setStats(stats.filter((_, j) => j !== i))}
-                  className="absolute top-2 right-2 p-1 text-slate-400 hover:text-red-600"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-                <Field label="Value">
-                  <Input defaultValue={s.value} />
-                </Field>
-                <Field label="Label">
-                  <Input defaultValue={s.label} />
-                </Field>
-              </div>
-            ))}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          {data.stats.map((s, i) => (
+            <div key={i} className="border border-slate-200 rounded-xl p-3 space-y-2 relative">
+              <button onClick={() => setData({ ...data, stats: data.stats.filter((_, j) => j !== i) })} className="absolute top-2 right-2 p-1 text-slate-400 hover:text-red-600">
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+              <Field label="Icon" hint="Calendar, Users, Trophy, Globe">
+                <Input value={s.icon} onChange={(e) => update(i, "icon", e.target.value)} />
+              </Field>
+              <Field label="Value">
+                <Input value={s.value} onChange={(e) => update(i, "value", e.target.value)} />
+              </Field>
+              <Field label="Label">
+                <Input value={s.label} onChange={(e) => update(i, "label", e.target.value)} />
+              </Field>
+            </div>
+          ))}
         </div>
       </div>
     </Card>

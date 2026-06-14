@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/app/lib/db";
 import { verifyAuth, unauthorized } from "@/app/lib/auth-server";
+import { logActivity } from "@/app/lib/activity";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -28,6 +29,10 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
 
     values.push(id);
     await pool.execute(`UPDATE testimonials SET ${updates.join(", ")} WHERE id = ?`, values);
+    if (body.status) {
+      const action = body.status === "approved" ? "publish" : "edit";
+      await logActivity(action, `Testimonial ${body.status} (id: ${id})`, auth.name);
+    }
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -42,6 +47,7 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
   const { id } = await ctx.params;
   try {
     await pool.execute("DELETE FROM testimonials WHERE id = ?", [id]);
+    await logActivity("delete", `Testimonial deleted (id: ${id})`, auth.name);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Calendar, MapPin, Users, Edit3, Trash2, Loader2, X, Save } from "lucide-react";
 import { PageHeader, Card, Button, Badge, Input, Select, Field, Textarea } from "../../components/ui";
+import { formatDateIST as fmt } from "@/app/lib/datetime";
 
 type Event = {
   id: number; title: string; start_date: string; end_date: string;
@@ -14,10 +15,6 @@ const STATUS_COLOR: Record<string, "green"|"blue"|"yellow"|"orange"|"slate"> = {
 };
 
 const BLANK = { title:"", start_date:"", end_date:"", venue:"", city:"", registrations:0, status:"Draft", description:"" };
-
-function fmt(d: string) {
-  return d ? new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : "";
-}
 
 export default function UpcomingEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -80,7 +77,7 @@ export default function UpcomingEventsPage() {
               <div key={e.id} className="px-5 sm:px-6 py-4 flex flex-col md:flex-row md:items-center gap-4 hover:bg-slate-50">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0B3D91] to-saffron text-white flex flex-col items-center justify-center shrink-0">
                   <Calendar className="w-4 h-4 mb-0.5"/>
-                  <span className="text-[10px] font-bold">{new Date(e.start_date).toLocaleString("en",{month:"short"})}</span>
+                  <span className="text-[10px] font-bold">{new Date(e.start_date).toLocaleString("en-IN",{month:"short", timeZone:"Asia/Kolkata"})}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1">

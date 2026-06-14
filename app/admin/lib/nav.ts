@@ -25,6 +25,8 @@ import {
   FileText,
   Tag,
   Medal,
+  Megaphone,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -48,9 +50,8 @@ export const NAV: NavItem[] = [
       { label: "History Page", href: "/admin/website/history", icon: Trophy },
       { label: "Events Page", href: "/admin/website/events", icon: CalendarPlus },
       { label: "Contact Page", href: "/admin/website/contact", icon: Mail },
-      { label: "Leadership Team", href: "/admin/website/leadership", icon: UserCheck },
-      { label: "Selection Policy", href: "/admin/website/selection-policy", icon: ClipboardList },
-      { label: "Partners & Sponsors", href: "/admin/website/partners", icon: Handshake },
+      { label: "Notices / Marquee", href: "/admin/website/notices", icon: Megaphone },
+      { label: "Announcement Popup", href: "/admin/website/popup", icon: Bell },
     ],
   },
   {
@@ -82,7 +83,7 @@ export const NAV: NavItem[] = [
   },
   { label: "Testimonials", href: "/admin/testimonials", icon: Quote },
   { label: "Partners Management", href: "/admin/partners", icon: Handshake },
-  { label: "Contact Management", href: "/admin/contact", icon: Mail, badge: "12" },
+  { label: "Contact Management", href: "/admin/contact", icon: Mail },
   { label: "SEO Management", href: "/admin/seo", icon: Search },
   { label: "Settings", href: "/admin/settings", icon: Settings },
   { label: "Admin Users", href: "/admin/users", icon: UserCog },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Image as ImageIcon,
   MessageSquare,
@@ -27,8 +27,151 @@ const TABS = [
   { id: "faq", label: "FAQ Section", icon: HelpCircle },
 ];
 
+export interface HeroData { eyebrow: string; title: string; description: string; enabled: boolean; }
+export interface FormData {
+  title: string; helper: string; submit_text: string; recipient_email: string;
+  reply_subject: string; reply_message: string; subjects: { value: string; label: string }[];
+  enabled: boolean;
+}
+export interface DetailsData {
+  heading: string; hours_label: string; address: string; phone: string; phone_link: string;
+  email: string; email_link: string; office_hours: string; enabled: boolean;
+}
+export interface SocialData {
+  heading: string; subtitle: string; links: { platform: string; url: string }[]; enabled: boolean;
+}
+export interface MapData {
+  title: string; embed_url: string; link_text: string; link_url: string; enabled: boolean;
+}
+export interface FAQItem { q: string; a: string; }
+export interface FAQData { title: string; items: FAQItem[]; enabled: boolean; }
+
+const DEFAULT_HERO: HeroData = {
+  eyebrow: "Reach Out",
+  title: "Contact Us",
+  description: "Have questions? Want to volunteer, start a team, or partner with us? We'd love to hear from you.",
+  enabled: true,
+};
+const DEFAULT_FORM: FormData = {
+  title: "Send Us a Message",
+  helper: "Fill out the form below and our team will get back to you within 24–48 hours.",
+  submit_text: "Send Message",
+  recipient_email: "wcrfi.india@gmail.com",
+  reply_subject: "We received your message – WRFI",
+  reply_message: "Thanks for reaching out to WRFI. Our team will review your message and respond within 24–48 hours.",
+  subjects: [
+    { value: "general", label: "General Inquiry" },
+    { value: "join", label: "Join / Register as Athlete" },
+    { value: "volunteer", label: "Volunteer" },
+    { value: "sponsor", label: "Sponsorship / Partnership" },
+    { value: "event", label: "Event Information" },
+    { value: "media", label: "Media / Press" },
+    { value: "other", label: "Other" },
+  ],
+  enabled: true,
+};
+const DEFAULT_DETAILS: DetailsData = {
+  heading: "Contact Details",
+  hours_label: "Office Hours",
+  address: "House no 53 shivlok phase 4\nKhajurikalan Piplani Bhopal Madhya Pradesh 462022",
+  phone: "+91 7223051792",
+  phone_link: "tel:+917223051792",
+  email: "wcrfi.india@gmail.com",
+  email_link: "mailto:wcrfi.india@gmail.com",
+  office_hours: "Mon – Fri: 10:00 AM – 5:00 PM IST",
+  enabled: true,
+};
+const DEFAULT_SOCIAL: SocialData = {
+  heading: "Follow Us",
+  subtitle: "Stay connected for the latest updates, events, and stories.",
+  links: [
+    { platform: "Facebook", url: "https://www.facebook.com/WCRFI/" },
+    { platform: "Twitter", url: "https://x.com/rugby_india" },
+    { platform: "Instagram", url: "https://www.instagram.com/wcrugby_india/" },
+    { platform: "YouTube", url: "https://www.youtube.com/@WheelchairRugbyIndia" },
+  ],
+  enabled: true,
+};
+const DEFAULT_MAP: MapData = {
+  title: "WRFI Office Location",
+  embed_url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3667.3!2d77.4!3d23.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDEyJzAwLjAiTiA3N8KwMjQnMDAuMCJF!5e0!3m2!1sen!2sin!4v1640000000000!5m2!1sen!2sin",
+  link_text: "Open in Maps",
+  link_url: "https://maps.google.com/?q=WRFI+Bhopal",
+  enabled: true,
+};
+const DEFAULT_FAQ: FAQData = {
+  title: "Frequently Asked Questions",
+  items: [
+    { q: "How can I join WRFI as an athlete?", a: "Fill out the contact form above with your details, or email us at wcrfi.india@gmail.com. We welcome athletes with physical disabilities from all states of India." },
+    { q: "Does WRFI provide equipment and wheelchairs?", a: "Yes, WRFI provides rugby-specific wheelchairs and equipment to registered athletes through our equipment support programs." },
+    { q: "How can I volunteer or support WRFI?", a: "We're always looking for volunteers, coaches, and supporters. Reach out through the contact form or email us to learn about opportunities." },
+    { q: "How can my organization sponsor or partner with WRFI?", a: "We offer multiple sponsorship and partnership tiers. Contact us with the 'Sponsorship / Partnership' subject for detailed information." },
+  ],
+  enabled: true,
+};
+
 export default function ContactPageCMS() {
   const [active, setActive] = useState("hero");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [hero, setHero] = useState<HeroData>(DEFAULT_HERO);
+  const [form, setForm] = useState<FormData>(DEFAULT_FORM);
+  const [details, setDetails] = useState<DetailsData>(DEFAULT_DETAILS);
+  const [social, setSocial] = useState<SocialData>(DEFAULT_SOCIAL);
+  const [mapData, setMapData] = useState<MapData>(DEFAULT_MAP);
+  const [faq, setFaq] = useState<FAQData>(DEFAULT_FAQ);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/contact-sections");
+        const { sections } = await res.json();
+        if (sections) {
+          if (sections.hero?.data) setHero(sections.hero.data as HeroData);
+          if (sections.form?.data) setForm(sections.form.data as FormData);
+          if (sections.details?.data) setDetails(sections.details.data as DetailsData);
+          if (sections.social?.data) setSocial(sections.social.data as SocialData);
+          if (sections.map?.data) setMapData(sections.map.data as MapData);
+          if (sections.faq?.data) setFaq(sections.faq.data as FAQData);
+        }
+      } catch (e) {
+        console.error("Failed to load contact sections:", e);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const saveAll = async () => {
+    setSaving(true);
+    try {
+      const payloads: { section_key: string; data: unknown; is_enabled: boolean }[] = [
+        { section_key: "hero", data: hero, is_enabled: hero.enabled },
+        { section_key: "form", data: form, is_enabled: form.enabled },
+        { section_key: "details", data: details, is_enabled: details.enabled },
+        { section_key: "social", data: social, is_enabled: social.enabled },
+        { section_key: "map", data: mapData, is_enabled: mapData.enabled },
+        { section_key: "faq", data: faq, is_enabled: faq.enabled },
+      ];
+      for (const p of payloads) {
+        await fetch("/api/contact-sections", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(p),
+        });
+      }
+      alert("Changes saved successfully!");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to save changes");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -45,8 +188,8 @@ export default function ContactPageCMS() {
             <Button variant="outline">
               <Eye className="w-4 h-4" /> Preview
             </Button>
-            <Button variant="primary">
-              <Save className="w-4 h-4" /> Save Changes
+            <Button variant="primary" onClick={saveAll} disabled={saving}>
+              <Save className="w-4 h-4" /> {saving ? "Saving..." : "Save Changes"}
             </Button>
           </>
         }
@@ -88,12 +231,12 @@ export default function ContactPageCMS() {
         </Card>
 
         <div className="space-y-6 min-w-0">
-          {active === "hero" && <HeroSection />}
-          {active === "form" && <FormSection />}
-          {active === "details" && <DetailsSection />}
-          {active === "social" && <SocialSection />}
-          {active === "map" && <MapSection />}
-          {active === "faq" && <FAQSection />}
+          {active === "hero" && <HeroSection data={hero} setData={setHero} />}
+          {active === "form" && <FormSection data={form} setData={setForm} />}
+          {active === "details" && <DetailsSection data={details} setData={setDetails} />}
+          {active === "social" && <SocialSection data={social} setData={setSocial} />}
+          {active === "map" && <MapSection data={mapData} setData={setMapData} />}
+          {active === "faq" && <FAQSection data={faq} setData={setFaq} />}
         </div>
       </div>
     </div>
@@ -127,29 +270,25 @@ function SectionToggleHeader({
 
 /* ────────────────────────────────  SECTIONS  ──────────────────────────────── */
 
-function HeroSection() {
-  const [enabled, setEnabled] = useState(true);
+function HeroSection({ data, setData }: { data: HeroData; setData: (d: HeroData) => void }) {
   return (
     <Card>
       <SectionToggleHeader
         title="Page Hero"
         description="Top banner of the Contact Us page."
-        enabled={enabled}
-        onToggle={setEnabled}
+        enabled={data.enabled}
+        onToggle={(v) => setData({ ...data, enabled: v })}
       />
       <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
         <Field label="Eyebrow Label">
-          <Input defaultValue="Reach Out" />
+          <Input value={data.eyebrow} onChange={(e) => setData({ ...data, eyebrow: e.target.value })} />
         </Field>
         <Field label="Hero Title" required>
-          <Input defaultValue="Contact Us" />
+          <Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} />
         </Field>
         <div className="md:col-span-2">
           <Field label="Description">
-            <Textarea
-              rows={3}
-              defaultValue="Have questions? Want to volunteer, start a team, or partner with us? We'd love to hear from you."
-            />
+            <Textarea rows={3} value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} />
           </Field>
         </div>
       </div>
@@ -157,52 +296,40 @@ function HeroSection() {
   );
 }
 
-function FormSection() {
-  const [enabled, setEnabled] = useState(true);
-  const [subjects, setSubjects] = useState([
-    { value: "general", label: "General Inquiry" },
-    { value: "join", label: "Join / Register as Athlete" },
-    { value: "volunteer", label: "Volunteer" },
-    { value: "sponsor", label: "Sponsorship / Partnership" },
-    { value: "event", label: "Event Information" },
-    { value: "media", label: "Media / Press" },
-    { value: "other", label: "Other" },
-  ]);
+function FormSection({ data, setData }: { data: FormData; setData: (d: FormData) => void }) {
+  const updateSubject = (i: number, field: "value" | "label", val: string) => {
+    const subjects = data.subjects.map((s, idx) => idx === i ? { ...s, [field]: val } : s);
+    setData({ ...data, subjects });
+  };
   return (
     <Card>
       <SectionToggleHeader
         title="Contact Form"
         description='"Send Us a Message" form — heading, helper text, subject options and submission settings.'
-        enabled={enabled}
-        onToggle={setEnabled}
+        enabled={data.enabled}
+        onToggle={(v) => setData({ ...data, enabled: v })}
       />
       <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
         <Field label="Form Title" required>
-          <Input defaultValue="Send Us a Message" />
+          <Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} />
         </Field>
         <Field label="Submit Button Text">
-          <Input defaultValue="Send Message" />
+          <Input value={data.submit_text} onChange={(e) => setData({ ...data, submit_text: e.target.value })} />
         </Field>
         <div className="md:col-span-2">
           <Field label="Helper Text">
-            <Textarea
-              rows={2}
-              defaultValue="Fill out the form below and our team will get back to you within 24–48 hours."
-            />
+            <Textarea rows={2} value={data.helper} onChange={(e) => setData({ ...data, helper: e.target.value })} />
           </Field>
         </div>
         <Field label="Recipient Email">
-          <Input defaultValue="wcrfi.india@gmail.com" />
+          <Input value={data.recipient_email} onChange={(e) => setData({ ...data, recipient_email: e.target.value })} />
         </Field>
         <Field label="Auto-Reply Subject">
-          <Input defaultValue="We received your message – WRFI" />
+          <Input value={data.reply_subject} onChange={(e) => setData({ ...data, reply_subject: e.target.value })} />
         </Field>
         <div className="md:col-span-2">
           <Field label="Auto-Reply Message">
-            <Textarea
-              rows={3}
-              defaultValue="Thanks for reaching out to WRFI. Our team will review your message and respond within 24–48 hours."
-            />
+            <Textarea rows={3} value={data.reply_message} onChange={(e) => setData({ ...data, reply_message: e.target.value })} />
           </Field>
         </div>
 
@@ -212,25 +339,25 @@ function FormSection() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setSubjects([...subjects, { value: "new", label: "New Subject" }])}
+              onClick={() => setData({ ...data, subjects: [...data.subjects, { value: "new", label: "New Subject" }] })}
             >
               <Plus className="w-3.5 h-3.5" /> Add Subject
             </Button>
           </div>
           <div className="space-y-2">
-            {subjects.map((s, i) => (
+            {data.subjects.map((s, i) => (
               <div key={i} className="border border-slate-200 rounded-xl p-3 flex items-center gap-3">
                 <GripVertical className="w-4 h-4 text-slate-300 cursor-grab shrink-0" />
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Field label="Value (key)">
-                    <Input defaultValue={s.value} />
+                    <Input value={s.value} onChange={(e) => updateSubject(i, "value", e.target.value)} />
                   </Field>
                   <Field label="Label">
-                    <Input defaultValue={s.label} />
+                    <Input value={s.label} onChange={(e) => updateSubject(i, "label", e.target.value)} />
                   </Field>
                 </div>
                 <button
-                  onClick={() => setSubjects(subjects.filter((_, j) => j !== i))}
+                  onClick={() => setData({ ...data, subjects: data.subjects.filter((_, j) => j !== i) })}
                   className="p-2 text-slate-400 hover:text-red-600 shrink-0"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -244,46 +371,42 @@ function FormSection() {
   );
 }
 
-function DetailsSection() {
-  const [enabled, setEnabled] = useState(true);
+function DetailsSection({ data, setData }: { data: DetailsData; setData: (d: DetailsData) => void }) {
   return (
     <Card>
       <SectionToggleHeader
         title="Contact Details"
         description="Address, phone, email and office hours block on the right sidebar."
-        enabled={enabled}
-        onToggle={setEnabled}
+        enabled={data.enabled}
+        onToggle={(v) => setData({ ...data, enabled: v })}
       />
       <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
         <Field label="Block Heading">
-          <Input defaultValue="Contact Details" />
+          <Input value={data.heading} onChange={(e) => setData({ ...data, heading: e.target.value })} />
         </Field>
         <Field label="Office Hours Label">
-          <Input defaultValue="Office Hours" />
+          <Input value={data.hours_label} onChange={(e) => setData({ ...data, hours_label: e.target.value })} />
         </Field>
         <div className="md:col-span-2">
           <Field label="Address (multi-line)" required>
-            <Textarea
-              rows={3}
-              defaultValue={"House no 53 shivlok phase 4\nKhajurikalan Piplani Bhopal Madhya Pradesh 462022"}
-            />
+            <Textarea rows={3} value={data.address} onChange={(e) => setData({ ...data, address: e.target.value })} />
           </Field>
         </div>
         <Field label="Phone" required>
-          <Input defaultValue="+91 7223051792" />
+          <Input value={data.phone} onChange={(e) => setData({ ...data, phone: e.target.value })} />
         </Field>
         <Field label="Phone Link (tel:)">
-          <Input defaultValue="tel:+917223051792" />
+          <Input value={data.phone_link} onChange={(e) => setData({ ...data, phone_link: e.target.value })} />
         </Field>
         <Field label="Email" required>
-          <Input defaultValue="wcrfi.india@gmail.com" />
+          <Input value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} />
         </Field>
         <Field label="Email Link (mailto:)">
-          <Input defaultValue="mailto:wcrfi.india@gmail.com" />
+          <Input value={data.email_link} onChange={(e) => setData({ ...data, email_link: e.target.value })} />
         </Field>
         <div className="md:col-span-2">
           <Field label="Office Hours">
-            <Input defaultValue="Mon – Fri: 10:00 AM – 5:00 PM IST" />
+            <Input value={data.office_hours} onChange={(e) => setData({ ...data, office_hours: e.target.value })} />
           </Field>
         </div>
       </div>
@@ -291,59 +414,63 @@ function DetailsSection() {
   );
 }
 
-function SocialSection() {
-  const [enabled, setEnabled] = useState(true);
-  const [socials, setSocials] = useState([
-    { platform: "Facebook", url: "https://www.facebook.com/WCRFI/" },
-    { platform: "Twitter", url: "https://x.com/rugby_india" },
-    { platform: "Instagram", url: "https://www.instagram.com/wcrugby_india/" },
-    { platform: "YouTube", url: "https://www.youtube.com/@WheelchairRugbyIndia" },
-  ]);
+function SocialSection({ data, setData }: { data: SocialData; setData: (d: SocialData) => void }) {
+  const updateLink = (i: number, field: "platform" | "url", val: string) => {
+    const links = data.links.map((s, idx) => idx === i ? { ...s, [field]: val } : s);
+    setData({ ...data, links });
+  };
+  const move = (i: number, dir: -1 | 1) => {
+    const arr = [...data.links];
+    const j = i + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    setData({ ...data, links: arr });
+  };
   return (
     <Card>
       <SectionToggleHeader
         title='"Follow Us" Block'
         description="Social media links shown in the right sidebar."
-        enabled={enabled}
-        onToggle={setEnabled}
+        enabled={data.enabled}
+        onToggle={(v) => setData({ ...data, enabled: v })}
       />
       <div className="p-5 sm:p-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Field label="Block Heading">
-            <Input defaultValue="Follow Us" />
+            <Input value={data.heading} onChange={(e) => setData({ ...data, heading: e.target.value })} />
           </Field>
           <Field label="Block Subtitle">
-            <Input defaultValue="Stay connected for the latest updates, events, and stories." />
+            <Input value={data.subtitle} onChange={(e) => setData({ ...data, subtitle: e.target.value })} />
           </Field>
         </div>
         <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500">{socials.length} social links</p>
+          <p className="text-sm text-slate-500">{data.links.length} social links</p>
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setSocials([...socials, { platform: "New", url: "https://" }])}
+            onClick={() => setData({ ...data, links: [...data.links, { platform: "New", url: "https://" }] })}
           >
             <Plus className="w-3.5 h-3.5" /> Add Social
           </Button>
         </div>
         <div className="space-y-2">
-          {socials.map((s, i) => (
+          {data.links.map((s, i) => (
             <div key={i} className="border border-slate-200 rounded-xl p-3 flex items-center gap-3">
               <GripVertical className="w-4 h-4 text-slate-300 cursor-grab shrink-0" />
               <div className="flex-1 grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-3">
                 <Field label="Platform">
-                  <Input defaultValue={s.platform} />
+                  <Input value={s.platform} onChange={(e) => updateLink(i, "platform", e.target.value)} />
                 </Field>
                 <Field label="URL">
-                  <Input defaultValue={s.url} />
+                  <Input value={s.url} onChange={(e) => updateLink(i, "url", e.target.value)} />
                 </Field>
               </div>
               <div className="flex flex-col">
-                <button className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronUp className="w-3.5 h-3.5" /></button>
-                <button className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronDown className="w-3.5 h-3.5" /></button>
+                <button onClick={() => move(i, -1)} className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronUp className="w-3.5 h-3.5" /></button>
+                <button onClick={() => move(i, 1)} className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronDown className="w-3.5 h-3.5" /></button>
               </div>
               <button
-                onClick={() => setSocials(socials.filter((_, j) => j !== i))}
+                onClick={() => setData({ ...data, links: data.links.filter((_, j) => j !== i) })}
                 className="p-2 text-slate-400 hover:text-red-600 shrink-0"
               >
                 <Trash2 className="w-4 h-4" />
@@ -356,32 +483,28 @@ function SocialSection() {
   );
 }
 
-function MapSection() {
-  const [enabled, setEnabled] = useState(true);
+function MapSection({ data, setData }: { data: MapData; setData: (d: MapData) => void }) {
   return (
     <Card>
       <SectionToggleHeader
         title="Map Embed"
         description="Google Maps iframe shown below the social block."
-        enabled={enabled}
-        onToggle={setEnabled}
+        enabled={data.enabled}
+        onToggle={(v) => setData({ ...data, enabled: v })}
       />
       <div className="p-5 sm:p-6 space-y-4">
         <Field label="Map Title (for accessibility)">
-          <Input defaultValue="WRFI Office Location" />
+          <Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} />
         </Field>
         <Field label="Google Maps Embed URL" required hint="Use the iframe src from Google Maps > Share > Embed a map">
-          <Textarea
-            rows={3}
-            defaultValue="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3667.3!2d77.4!3d23.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDEyJzAwLjAiTiA3N8KwMjQnMDAuMCJF!5e0!3m2!1sen!2sin!4v1640000000000!5m2!1sen!2sin"
-          />
+          <Textarea rows={3} value={data.embed_url} onChange={(e) => setData({ ...data, embed_url: e.target.value })} />
         </Field>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Field label='"Open in Maps" Link Text'>
-            <Input defaultValue="Open in Maps" />
+            <Input value={data.link_text} onChange={(e) => setData({ ...data, link_text: e.target.value })} />
           </Field>
           <Field label='"Open in Maps" URL'>
-            <Input defaultValue="https://maps.google.com/?q=WRFI+Bhopal" />
+            <Input value={data.link_url} onChange={(e) => setData({ ...data, link_url: e.target.value })} />
           </Field>
         </div>
       </div>
@@ -389,46 +512,50 @@ function MapSection() {
   );
 }
 
-function FAQSection() {
-  const [enabled, setEnabled] = useState(true);
-  const [items, setItems] = useState([
-    { q: "How can I join WRFI as an athlete?", a: "Fill out the contact form above with your details, or email us at wcrfi.india@gmail.com. We welcome athletes with physical disabilities from all states of India." },
-    { q: "Does WRFI provide equipment and wheelchairs?", a: "Yes, WRFI provides rugby-specific wheelchairs and equipment to registered athletes through our equipment support programs." },
-    { q: "How can I volunteer or support WRFI?", a: "We're always looking for volunteers, coaches, and supporters. Reach out through the contact form or email us to learn about opportunities." },
-    { q: "How can my organization sponsor or partner with WRFI?", a: "We offer multiple sponsorship and partnership tiers. Contact us with the 'Sponsorship / Partnership' subject for detailed information." },
-  ]);
+function FAQSection({ data, setData }: { data: FAQData; setData: (d: FAQData) => void }) {
+  const update = (i: number, field: "q" | "a", val: string) => {
+    const items = data.items.map((s, idx) => idx === i ? { ...s, [field]: val } : s);
+    setData({ ...data, items });
+  };
+  const move = (i: number, dir: -1 | 1) => {
+    const arr = [...data.items];
+    const j = i + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    setData({ ...data, items: arr });
+  };
   return (
     <Card>
       <SectionToggleHeader
         title="Frequently Asked Questions"
         description="Accordion of common questions shown at the bottom of the page."
-        enabled={enabled}
-        onToggle={setEnabled}
+        enabled={data.enabled}
+        onToggle={(v) => setData({ ...data, enabled: v })}
       />
       <div className="p-5 sm:p-6 space-y-4">
         <Field label="Section Title">
-          <Input defaultValue="Frequently Asked Questions" />
+          <Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} />
         </Field>
         <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500">{items.length} FAQs</p>
+          <p className="text-sm text-slate-500">{data.items.length} FAQs</p>
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => setItems([...items, { q: "New question", a: "Answer..." }])}
+            onClick={() => setData({ ...data, items: [...data.items, { q: "New question", a: "Answer..." }] })}
           >
             <Plus className="w-3.5 h-3.5" /> Add FAQ
           </Button>
         </div>
         <div className="space-y-3">
-          {items.map((it, i) => (
+          {data.items.map((it, i) => (
             <div key={i} className="border border-slate-200 rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <Badge color="slate">FAQ #{i + 1}</Badge>
                 <div className="flex items-center gap-1">
-                  <button className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronUp className="w-3.5 h-3.5" /></button>
-                  <button className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronDown className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => move(i, -1)} className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronUp className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => move(i, 1)} className="p-1.5 text-slate-400 hover:text-slate-700"><ChevronDown className="w-3.5 h-3.5" /></button>
                   <button
-                    onClick={() => setItems(items.filter((_, j) => j !== i))}
+                    onClick={() => setData({ ...data, items: data.items.filter((_, j) => j !== i) })}
                     className="p-1.5 text-slate-400 hover:text-red-600"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -436,10 +563,10 @@ function FAQSection() {
                 </div>
               </div>
               <Field label="Question" required>
-                <Input defaultValue={it.q} />
+                <Input value={it.q} onChange={(e) => update(i, "q", e.target.value)} />
               </Field>
               <Field label="Answer">
-                <Textarea rows={3} defaultValue={it.a} />
+                <Textarea rows={3} value={it.a} onChange={(e) => update(i, "a", e.target.value)} />
               </Field>
             </div>
           ))}

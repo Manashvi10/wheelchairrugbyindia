@@ -439,15 +439,21 @@ function StatsSection() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {counters.map((c, i) => (
-            <div key={i} className="border border-slate-200 rounded-xl p-4 grid grid-cols-[1fr_1fr_auto_auto_auto] gap-2 items-end">
-              <Field label="Icon Name"><Input value={c.icon} onChange={(e) => updateCounter(i, "icon", e.target.value)} placeholder="Users" /></Field>
-              <Field label="Value"><Input type="number" value={c.value} onChange={(e) => updateCounter(i, "value", Number(e.target.value))} /></Field>
-              <Field label="Suffix"><Input value={c.suffix} onChange={(e) => updateCounter(i, "suffix", e.target.value)} /></Field>
-              <Field label="Label"><Input value={c.label} onChange={(e) => updateCounter(i, "label", e.target.value)} /></Field>
-              <button onClick={() => setCounters(counters.filter((_, j) => j !== i))}
-                className="h-[42px] w-10 flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
-                <Trash2 className="w-4 h-4" />
-              </button>
+            <div key={i} className="border border-slate-200 rounded-xl p-4 space-y-2">
+              <div className="grid grid-cols-[1fr_90px_64px] gap-2">
+                <Field label="Icon Name"><Input value={c.icon} onChange={(e) => updateCounter(i, "icon", e.target.value)} placeholder="Users" /></Field>
+                <Field label="Value"><Input type="number" value={c.value} onChange={(e) => updateCounter(i, "value", Number(e.target.value))} /></Field>
+                <Field label="Suffix"><Input value={c.suffix} onChange={(e) => updateCounter(i, "suffix", e.target.value)} /></Field>
+              </div>
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <Field label="Label"><Input value={c.label} onChange={(e) => updateCounter(i, "label", e.target.value)} /></Field>
+                </div>
+                <button onClick={() => setCounters(counters.filter((_, j) => j !== i))}
+                  className="h-[42px] w-10 flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -518,32 +524,48 @@ function VMVSection() {
   );
 }
 
-type MilestoneItem = { year: string; title: string; description: string; color: string };
+type MilestoneItem = { year: string; title: string; description: string; color: string; icon?: string };
+
+const HOME_DEFAULT_MILESTONES: MilestoneItem[] = [
+  { year: "1977", title: "Sport Invented", description: "Wheelchair rugby was invented in Winnipeg, Canada by quadriplegic athletes seeking an inclusive competitive sport.", icon: "Flag", color: "saffron" },
+  { year: "1993", title: "IWRF Established", description: "The International Wheelchair Rugby Federation was formed to govern the sport globally.", icon: "Globe", color: "blue" },
+  { year: "1996", title: "Paralympic Debut", description: "Wheelchair rugby featured as a demonstration sport at the Atlanta Paralympics.", icon: "Trophy", color: "green" },
+  { year: "2000", title: "Full Medal Sport", description: "Became an official medal sport at the Sydney 2000 Paralympic Games.", icon: "Medal", color: "gold" },
+  { year: "2009", title: "Introduced in India", description: "Wheelchair rugby was introduced in India, igniting a new chapter in Indian para-sports history.", icon: "Flag", color: "saffron" },
+  { year: "2019", title: "WRFI Established", description: "Wheelchair Rugby Federation of India was officially formed as the national governing body.", icon: "Star", color: "blue" },
+  { year: "2024", title: "International Debut", description: "Team India competed in its first international wheelchair rugby tournament on the global stage.", icon: "Globe", color: "green" },
+];
 
 function TimelineSection() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [enabled, setEnabled] = useState(true);
-  const [entries, setEntries] = useState<MilestoneItem[]>([
-    { year: "1977", title: "Sport Invented", description: "", color: "bg-saffron" },
-    { year: "2009", title: "Introduced in India", description: "", color: "bg-india-green" },
-    { year: "2019", title: "WRFI Established", description: "", color: "bg-saffron" },
-    { year: "2024", title: "International Debut", description: "", color: "bg-gold" },
-  ]);
+  const [eyebrow, setEyebrow] = useState("Milestones");
+  const [title, setTitle] = useState("The Journey of Wheelchair Rugby");
+  const [entries, setEntries] = useState<MilestoneItem[]>(HOME_DEFAULT_MILESTONES);
 
   useEffect(() => {
     loadSection("timeline").then((r) => {
-      if (Array.isArray(r.data) && r.data.length) setEntries(r.data as MilestoneItem[]);
+      // Support both old array format and new object format (shared with history admin)
+      if (Array.isArray(r.data) && r.data.length) {
+        setEntries(r.data as MilestoneItem[]);
+      } else if (r.data && typeof r.data === "object") {
+        const d = r.data as { eyebrow?: string; title?: string; entries?: MilestoneItem[] };
+        if (d.eyebrow) setEyebrow(d.eyebrow);
+        if (d.title) setTitle(d.title);
+        if (d.entries && d.entries.length) setEntries(d.entries);
+      }
       if (r.is_enabled !== undefined) setEnabled(!!r.is_enabled);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
 
   const handleSave = useCallback(async () => {
-    setSaving(true); await saveSection("timeline", entries, enabled);
+    setSaving(true);
+    await saveSection("timeline", { eyebrow, title, entries, enabled }, enabled);
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 3000);
-  }, [entries, enabled]);
+  }, [eyebrow, title, entries, enabled]);
 
   const update = (i: number, field: keyof MilestoneItem, val: string) =>
     setEntries(entries.map((e, idx) => idx === i ? { ...e, [field]: val } : e));
@@ -560,25 +582,33 @@ function TimelineSection() {
 
   return (
     <Card>
-      <SectionToggleHeader title="Journey Timeline" description="Historical milestones displayed on the homepage." enabled={enabled} onToggle={setEnabled} />
+      <SectionToggleHeader title="Journey Timeline" description="Shared with History page. Milestones display on home & /history." enabled={enabled} onToggle={setEnabled} />
       <div className="p-5 sm:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <Field label="Section Eyebrow"><Input value={eyebrow} onChange={(ev) => setEyebrow(ev.target.value)} /></Field>
+          <Field label="Section Title"><Input value={title} onChange={(ev) => setTitle(ev.target.value)} /></Field>
+        </div>
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-slate-500">{entries.length} milestones</p>
-          <Button variant="secondary" size="sm" onClick={() => setEntries([...entries, { year: "2025", title: "New Milestone", description: "", color: "bg-saffron" }])}>
+          <Button variant="secondary" size="sm" onClick={() => setEntries([...entries, { year: "2025", title: "New Milestone", description: "", icon: "Flag", color: "saffron" }])}>
             <Plus className="w-3.5 h-3.5" /> Add Milestone
           </Button>
         </div>
         <div className="space-y-3">
           {entries.map((e, i) => (
-            <div key={i} className="border border-slate-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-[80px_1fr_1fr_auto] gap-3 items-start">
-              <Field label="Year"><Input value={e.year} onChange={(ev) => update(i, "year", ev.target.value)} /></Field>
-              <Field label="Title"><Input value={e.title} onChange={(ev) => update(i, "title", ev.target.value)} /></Field>
-              <Field label="Description"><Input value={e.description} onChange={(ev) => update(i, "description", ev.target.value)} /></Field>
-              <div className="flex items-end gap-1 h-full pb-0.5">
-                <button onClick={() => move(i, -1)} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"><ChevronUp className="w-3.5 h-3.5" /></button>
-                <button onClick={() => move(i, 1)} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"><ChevronDown className="w-3.5 h-3.5" /></button>
-                <button onClick={() => setEntries(entries.filter((_, j) => j !== i))} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-3.5 h-3.5" /></button>
+            <div key={i} className="border border-slate-200 rounded-xl p-4 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-[100px_1fr_1fr_1fr_auto] gap-3 items-start">
+                <Field label="Year"><Input value={e.year} onChange={(ev) => update(i, "year", ev.target.value)} /></Field>
+                <Field label="Title"><Input value={e.title} onChange={(ev) => update(i, "title", ev.target.value)} /></Field>
+                <Field label="Icon"><Input value={e.icon || "Flag"} onChange={(ev) => update(i, "icon", ev.target.value)} placeholder="Flag, Globe, Trophy, Medal, Star" /></Field>
+                <Field label="Color"><Input value={e.color} onChange={(ev) => update(i, "color", ev.target.value)} placeholder="saffron, blue, green, gold" /></Field>
+                <div className="flex items-end gap-1 h-full pb-0.5">
+                  <button onClick={() => move(i, -1)} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"><ChevronUp className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => move(i, 1)} className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"><ChevronDown className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setEntries(entries.filter((_, j) => j !== i))} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-3.5 h-3.5" /></button>
+                </div>
               </div>
+              <Field label="Description"><Input value={e.description} onChange={(ev) => update(i, "description", ev.target.value)} /></Field>
             </div>
           ))}
         </div>

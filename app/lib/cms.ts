@@ -58,7 +58,7 @@ export async function getAboutSection<T = unknown>(key: string): Promise<{ data:
 
 export type DBCommitteeMember = {
   id: number; name: string; designation: string; bio: string | null;
-  image_url: string | null; sort_order: number; is_active: number;
+  image_url: string | null; linkedin_url: string | null; sort_order: number; is_active: number;
 };
 
 export async function getCommitteeMembers(): Promise<DBCommitteeMember[]> {
