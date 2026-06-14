@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     const user = await login(email, password, remember);
     if (user) {
-      router.push("/admin");
+      window.location.href = "/admin";
     } else {
       setError("Invalid email or password. Please try again.");
       setLoading(false);

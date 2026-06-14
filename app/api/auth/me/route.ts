@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     const token = req.cookies.get("wrfi_token")?.value;
 
     if (!token) {
-      return NextResponse.json({ user: null }, { status: 401 });
+      return NextResponse.json({ user: null });
     }
 
     const { payload } = await jwtVerify(token, JWT_SECRET);
