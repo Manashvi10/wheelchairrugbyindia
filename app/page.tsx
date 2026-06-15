@@ -15,6 +15,8 @@ import CookieConsent from "./components/CookieConsent";
 import { getAllCMSSections } from "./lib/cms";
 import pool from "./lib/db";
 
+export const dynamic = "force-dynamic";
+
 async function getTestimonials() {
   try {
     const [rows] = await pool.execute(

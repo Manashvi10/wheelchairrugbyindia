@@ -3,6 +3,8 @@ import Footer from "../components/Footer";
 import { CheckCircle, Users, Trophy, FileText, Target, Award, type LucideIcon } from "lucide-react";
 import { getAboutSection } from "../lib/cms";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Selection Policy - WRFI | Wheelchair Rugby Federation of India",
   description:

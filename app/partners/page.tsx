@@ -3,6 +3,8 @@ import Footer from "../components/Footer";
 import { Handshake, Star, Globe, Award, Building2 } from "lucide-react";
 import { getAboutSection, getPartners } from "../lib/cms";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Our Partners - WRFI | Wheelchair Rugby Federation of India",
   description:

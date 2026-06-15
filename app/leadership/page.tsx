@@ -2,6 +2,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { getCommitteeMembers, getAboutSection } from "../lib/cms";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Leadership - WRFI | Wheelchair Rugby Federation of India",
   description:
