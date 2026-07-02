@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { partnerLogos } from "./PartnerLogos";
+import { ArrowRight, Building2 } from "lucide-react";
+import type { DBPartner } from "../lib/cms";
 
-const sponsors = partnerLogos.slice(0, 6);
-
-export default function Sponsors() {
+export default function Sponsors({ partners = [] }: { partners?: DBPartner[] }) {
+  if (!partners.length) return null;
   return (
     <section className="relative py-10 sm:py-14 bg-white overflow-hidden">
       {/* Watermark — clamped to section width, no overflow */}
@@ -41,13 +40,26 @@ export default function Sponsors() {
 
         {/* Sponsor logo grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-          {sponsors.map((sponsor) => (
+          {partners.map((p) => (
             <div
-              key={sponsor.name}
+              key={p.id}
               className="group bg-white border border-slate-200 rounded-xl p-2 sm:p-3 flex items-center justify-center min-h-[80px] sm:min-h-[90px] card-hover shadow-sm hover:border-saffron/40 transition-all"
-              title={sponsor.name}
+              title={p.name}
             >
-              <div className="w-full h-12 sm:h-14">{sponsor.svg}</div>
+              {p.logo_url ? (
+                <img
+                  src={p.logo_url}
+                  alt={p.name}
+                  className="w-full h-12 sm:h-14 object-contain"
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-1 text-center px-1">
+                  <Building2 className="w-5 h-5 text-saffron" />
+                  <span className="text-[11px] sm:text-xs font-bold text-navy leading-tight line-clamp-2">
+                    {p.name}
+                  </span>
+                </div>
+              )}
             </div>
           ))}
         </div>

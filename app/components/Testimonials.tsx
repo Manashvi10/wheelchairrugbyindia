@@ -24,28 +24,42 @@ export default function Testimonials({ items }: { items?: TestimonialItem[] }) {
 
     let animFrame: number;
     let isPaused = false;
+    // Track position as a float; setting scrollLeft directly with a fractional
+    // increment can get stuck on browsers that round scrollLeft to integers.
+    let pos = el.scrollLeft;
 
     const scroll = () => {
-      if (!isPaused && el) {
-        el.scrollLeft += 0.7;
-        if (el.scrollLeft >= el.scrollWidth / 2) {
-          el.scrollLeft = 0;
-        }
+      if (!isPaused) {
+        const half = el.scrollWidth / 2;
+        pos += 0.7;
+        if (half > 0 && pos >= half) pos -= half;
+        el.scrollLeft = pos;
       }
       animFrame = requestAnimationFrame(scroll);
     };
 
     animFrame = requestAnimationFrame(scroll);
 
-    el.addEventListener("mouseenter", () => (isPaused = true));
-    el.addEventListener("mouseleave", () => (isPaused = false));
-    el.addEventListener("touchstart", () => (isPaused = true), { passive: true });
-    el.addEventListener("touchend", () => setTimeout(() => (isPaused = false), 2000), { passive: true });
+    const pause = () => (isPaused = true);
+    const resume = () => (isPaused = false);
+    el.addEventListener("mouseenter", pause);
+    el.addEventListener("mouseleave", resume);
+    el.addEventListener("touchstart", pause, { passive: true });
+    el.addEventListener("touchend", () => setTimeout(resume, 2000), { passive: true });
 
-    return () => cancelAnimationFrame(animFrame);
-  }, []);
+    return () => {
+      cancelAnimationFrame(animFrame);
+      el.removeEventListener("mouseenter", pause);
+      el.removeEventListener("mouseleave", resume);
+      el.removeEventListener("touchstart", pause);
+    };
+  }, [testimonials.length]);
 
-  const cards = testimonials.length >= 3 ? [...testimonials, ...testimonials] : [...testimonials, ...testimonials, ...testimonials];
+  // Pad the list so there are enough cards for a smooth loop, then duplicate
+  // exactly once so the second half mirrors the first for a seamless reset.
+  let base = testimonials;
+  while (base.length > 0 && base.length < 4) base = [...base, ...testimonials];
+  const cards = [...base, ...base];
 
   return (
     <section

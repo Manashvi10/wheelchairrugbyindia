@@ -12,7 +12,7 @@ import Sponsors from "./components/Sponsors";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import CookieConsent from "./components/CookieConsent";
-import { getAllCMSSections } from "./lib/cms";
+import { getAllCMSSections, getPartners } from "./lib/cms";
 import pool from "./lib/db";
 
 export const dynamic = "force-dynamic";
@@ -20,16 +20,17 @@ export const dynamic = "force-dynamic";
 async function getTestimonials() {
   try {
     const [rows] = await pool.execute(
-      "SELECT name, role, quote_text, avatar_url, rating FROM testimonials WHERE status = 'approved' ORDER BY sort_order ASC, id ASC"
+      "SELECT name, role, quote_text, avatar_url, rating FROM testimonials WHERE status <> 'rejected' ORDER BY sort_order ASC, id ASC"
     );
     return rows as Array<{ name: string; role: string; quote_text: string; avatar_url: string | null; rating: number }>;
   } catch { return []; }
 }
 
 export default async function Home() {
-  const [cms, testimonials] = await Promise.all([
+  const [cms, testimonials, partners] = await Promise.all([
     getAllCMSSections(),
     getTestimonials(),
+    getPartners(),
   ]);
 
   return (
@@ -43,8 +44,8 @@ export default async function Home() {
         {cms.events?.is_enabled !== false && <Events />}
         {cms.vmv?.is_enabled !== false && <VisionMission data={cms.vmv?.data as unknown[] | undefined} />}
         {cms.timeline?.is_enabled !== false && <History data={cms.timeline?.data as unknown[] | undefined} />}
-        {cms.gallery?.is_enabled !== false && <Gallery />}
-        {cms.partners?.is_enabled !== false && <Sponsors />}
+        {cms.gallery?.is_enabled !== false && <Gallery data={cms.gallery?.data as unknown[] | undefined} />}
+        {cms.partners?.is_enabled !== false && <Sponsors partners={partners} />}
         {cms.contact?.is_enabled !== false && <Contact data={cms.contact?.data} />}
         {cms.testimonials?.is_enabled !== false && <Testimonials items={testimonials} />}
       </main>

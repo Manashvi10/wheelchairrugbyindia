@@ -1,4 +1,6 @@
-const galleryImages = [
+type GalleryImage = { src: string; alt?: string; span?: string };
+
+const DEFAULT_GALLERY: GalleryImage[] = [
   {
     src: "/images/g1.jpg",
     alt: "Wheelchair rugby match in action",
@@ -31,7 +33,9 @@ const galleryImages = [
   },
 ];
 
-export default function Gallery() {
+export default function Gallery({ data }: { data?: unknown[] }) {
+  const galleryImages: GalleryImage[] =
+    Array.isArray(data) && data.length ? (data as GalleryImage[]) : DEFAULT_GALLERY;
   return (
     <section
       id="gallery"

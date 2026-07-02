@@ -10,6 +10,7 @@ import {
   Clock,
   Phone,
   Quote,
+  Images,
   Eye,
   Plus,
   Trash2,
@@ -29,6 +30,7 @@ const TABS = [
   { id: "stats", label: "Numbers That Inspire", icon: Hash },
   { id: "vmv", label: "Vision / Motto / Values", icon: Target },
   { id: "timeline", label: "Journey Timeline", icon: Clock },
+  { id: "gallery", label: "Photo Gallery", icon: Images },
   { id: "contact", label: "Contact Section", icon: Phone },
   { id: "testimonials", label: "Testimonials", icon: Quote },
 ];
@@ -89,6 +91,7 @@ export default function HomePageCMS() {
           {active === "stats" && <StatsSection />}
           {active === "vmv" && <VMVSection />}
           {active === "timeline" && <TimelineSection />}
+          {active === "gallery" && <GallerySection />}
           {active === "contact" && <ContactSection />}
           {active === "testimonials" && <TestimonialsSection />}
         </div>
@@ -752,6 +755,79 @@ function TestimonialsSection() {
           ))}
         </div>
       </div>
+    </Card>
+  );
+}
+
+type GalleryItem = { src: string; alt: string; span?: string };
+
+const DEFAULT_GALLERY_ITEMS: GalleryItem[] = [
+  { src: "/images/g1.jpg", alt: "Wheelchair rugby match in action", span: "col-span-2 row-span-2" },
+  { src: "/images/g2.jpg", alt: "Athletes training on the court", span: "" },
+  { src: "/images/g3.jpg", alt: "Team huddle before a game", span: "" },
+  { src: "/images/g4.jpg", alt: "Championship celebration", span: "" },
+  { src: "/images/g5.jpg", alt: "Coaching session with athletes", span: "" },
+  { src: "/images/g6.jpg", alt: "National championship opening ceremony", span: "col-span-2" },
+];
+
+function GallerySection() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [enabled, setEnabled] = useState(true);
+  const [items, setItems] = useState<GalleryItem[]>(DEFAULT_GALLERY_ITEMS);
+
+  useEffect(() => {
+    loadSection("gallery").then((r) => {
+      if (Array.isArray(r.data) && r.data.length) setItems(r.data as GalleryItem[]);
+      if (r.is_enabled !== undefined) setEnabled(!!r.is_enabled);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const handleSave = useCallback(async () => {
+    setSaving(true);
+    await saveSection("gallery", items, enabled);
+    setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 3000);
+  }, [items, enabled]);
+
+  const update = (i: number, field: keyof GalleryItem, val: string) =>
+    setItems(items.map((it, idx) => idx === i ? { ...it, [field]: val } : it));
+
+  if (loading) return <SectionLoader />;
+
+  return (
+    <Card>
+      <SectionToggleHeader title="Photo Gallery" description="Images shown in the homepage Photo Gallery grid." enabled={enabled} onToggle={setEnabled} />
+      <div className="p-5 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-slate-500">{items.length} image{items.length !== 1 ? "s" : ""}</p>
+          <Button variant="secondary" size="sm" onClick={() => setItems([...items, { src: "", alt: "", span: "" }])}>
+            <Plus className="w-3.5 h-3.5" /> Add Image
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {items.map((it, i) => (
+            <div key={i} className="border border-slate-200 rounded-xl p-3 space-y-2">
+              <ImageUploader label={`Image ${i + 1}`} value={it.src} onChange={(url) => update(i, "src", url)} />
+              <Field label="Caption / Alt Text">
+                <Input value={it.alt} onChange={(e) => update(i, "alt", e.target.value)} />
+              </Field>
+              <div className="flex items-center justify-between gap-2">
+                <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+                  <input type="checkbox" className="accent-saffron" checked={(it.span ?? "").includes("col-span-2")}
+                    onChange={(e) => update(i, "span", e.target.checked ? "col-span-2" : "")} />
+                  Wide (2 columns)
+                </label>
+                <button onClick={() => setItems(items.filter((_, j) => j !== i))} className="p-1.5 text-slate-400 hover:text-red-600">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <SaveBar saving={saving} saved={saved} onSave={handleSave} />
     </Card>
   );
 }

@@ -155,11 +155,23 @@ export default function HistoryPageCMS() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/history-sections");
-        const { sections } = await res.json();
-        if (sections) {
-          if (sections.hero?.data) setHero(sections.hero.data as HeroData);
-          if (sections.timeline?.data) setTimeline(sections.timeline.data as TimelineData);
+        const [hRes, tRes] = await Promise.all([
+          fetch("/api/history-sections"),
+          fetch("/api/cms/timeline"),
+        ]);
+        const { sections } = await hRes.json();
+        if (sections?.hero?.data) setHero(sections.hero.data as HeroData);
+        const tJson = await tRes.json();
+        if (tJson?.data && typeof tJson.data === "object" && !Array.isArray(tJson.data)) {
+          const d = tJson.data as Partial<TimelineData> & { entries?: TimelineEntry[] };
+          setTimeline({
+            eyebrow: d.eyebrow ?? DEFAULT_TIMELINE.eyebrow,
+            title: d.title ?? DEFAULT_TIMELINE.title,
+            entries: d.entries && d.entries.length ? d.entries : DEFAULT_TIMELINE.entries,
+            enabled: tJson.is_enabled !== false,
+          });
+        } else if (Array.isArray(tJson?.data) && tJson.data.length) {
+          setTimeline((prev) => ({ ...prev, entries: tJson.data as TimelineEntry[], enabled: tJson.is_enabled !== false }));
         }
       } catch (e) {
         console.error("Failed to load history sections:", e);
@@ -172,17 +184,18 @@ export default function HistoryPageCMS() {
   const saveAll = async () => {
     setSaving(true);
     try {
-      const payloads = [
-        { section_key: "hero", data: hero, is_enabled: hero.enabled },
-        { section_key: "timeline", data: timeline, is_enabled: timeline.enabled },
-      ];
-      for (const p of payloads) {
-        await fetch("/api/history-sections", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(p),
-        });
-      }
+      // Hero stays in history_sections (used by /history page hero)
+      await fetch("/api/history-sections", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ section_key: "hero", data: hero, is_enabled: hero.enabled }),
+      });
+      // Timeline is shared via homepage_sections.timeline (home + /history read this)
+      await fetch("/api/cms/timeline", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: timeline, is_enabled: timeline.enabled }),
+      });
       alert("Changes saved successfully!");
     } catch (e) {
       console.error(e);

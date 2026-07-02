@@ -4,9 +4,27 @@ type AboutData = {
   btn1_text?: string; btn1_url?: string; btn2_text?: string; btn2_url?: string;
 };
 
+const DEFAULT_VIDEO =
+  "https://www.youtube.com/embed/vZL79Cq20eo?autoplay=1&mute=1&loop=1&playlist=vZL79Cq20eo&controls=1&modestbranding=1&rel=0";
+
+// Accepts embed URLs, watch?v= links, or youtu.be short links and returns a
+// valid YouTube embed URL. Returns "" for empty/whitespace input.
+function toEmbedUrl(raw?: string): string {
+  if (!raw || !raw.trim()) return "";
+  const url = raw.trim();
+  const id =
+    url.match(/youtu\.be\/([\w-]+)/)?.[1] ??
+    url.match(/[?&]v=([\w-]+)/)?.[1] ??
+    url.match(/youtube\.com\/embed\/([\w-]+)/)?.[1];
+  if (id) {
+    return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=1&modestbranding=1&rel=0`;
+  }
+  return url;
+}
+
 export default function About({ data }: { data?: unknown }) {
   const d = (data as AboutData) ?? {};
-  const videoUrl = d.video_url ?? "https://www.youtube.com/embed/vZL79Cq20eo?autoplay=1&mute=1&loop=1&playlist=vZL79Cq20eo&controls=1&modestbranding=1&rel=0";
+  const videoUrl = toEmbedUrl(d.video_url) || DEFAULT_VIDEO;
   const sinceYear = d.since_year ?? "2009";
   const badge = d.section_badge ?? "About WRFI";
   const title = d.title ?? "Empowering Athletes,";

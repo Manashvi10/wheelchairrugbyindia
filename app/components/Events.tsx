@@ -3,14 +3,32 @@
 import { useEffect, useState } from "react";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 
-const EVENT_DATE = new Date("2026-08-15T09:00:00+05:30");
+type UpcomingEvent = {
+  title: string; date: string; location: string; description: string;
+  status: string; featured: boolean; image_url: string;
+  countdown_date: string; register_url: string;
+};
 
-function Countdown() {
+const DEFAULT_EVENT: UpcomingEvent = {
+  title: "WRFI National Wheelchair Rugby Championship 2026",
+  date: "May 15 – 18, 2026",
+  location: "Thyagaraj Sports Complex, New Delhi",
+  description:
+    "The premier national wheelchair rugby tournament featuring teams from across India. Six days of intense competition, skill showcases, and an inclusive sports festival.",
+  status: "Registrations Open",
+  featured: true,
+  image_url: "/images/up.png",
+  countdown_date: "2026-08-15T09:00:00+05:30",
+  register_url: "#contact",
+};
+
+function Countdown({ targetISO }: { targetISO: string }) {
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    const target = new Date(targetISO).getTime();
     const tick = () => {
-      const diff = Math.max(0, EVENT_DATE.getTime() - Date.now());
+      const diff = Math.max(0, target - Date.now());
       setTime({
         days: Math.floor(diff / 86400000),
         hours: Math.floor((diff % 86400000) / 3600000),
@@ -21,7 +39,7 @@ function Countdown() {
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [targetISO]);
 
   const boxes = [
     { value: time.days, label: "Days" },
@@ -50,6 +68,24 @@ function Countdown() {
 }
 
 export default function Events() {
+  const [event, setEvent] = useState<UpcomingEvent>(DEFAULT_EVENT);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/events-sections", { cache: "no-store" });
+        const { sections } = await res.json();
+        const events = (sections?.upcoming?.data?.events ?? []) as UpcomingEvent[];
+        if (events.length) {
+          const featured = events.find((e) => e.featured) ?? events[0];
+          setEvent({ ...DEFAULT_EVENT, ...featured });
+        }
+      } catch {
+        /* keep default */
+      }
+    })();
+  }, []);
+
   return (
     <section
       id="events"
@@ -77,50 +113,52 @@ export default function Events() {
           {/* Poster / Image */}
           <div className="relative h-[280px] sm:h-[360px] lg:h-auto">
             <img
-              src="/images/up.png"
-              alt="Wheelchair rugby championship poster"
+              src={event.image_url || "/images/up.png"}
+              alt={event.title}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-navy/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-navy/30" />
-            <div className="absolute top-4 left-4 px-3 py-1.5 bg-saffron text-white text-xs font-bold rounded-full uppercase tracking-wider">
-              Registrations Open
-            </div>
+            {event.status && (
+              <div className="absolute top-4 left-4 px-3 py-1.5 bg-saffron text-white text-xs font-bold rounded-full uppercase tracking-wider">
+                {event.status}
+              </div>
+            )}
           </div>
 
           {/* Event details */}
           <div className="p-6 sm:p-10 lg:p-12 flex flex-col justify-center space-y-5 overflow-hidden">
             <h3 className="text-xl sm:text-3xl font-black text-navy leading-tight">
-              WRFI National Wheelchair Rugby Championship 2026
+              {event.title}
             </h3>
 
             <div className="flex flex-col gap-3 text-slate-600">
               <span className="flex items-center gap-2.5 min-w-0">
                 <Calendar className="w-5 h-5 text-saffron shrink-0" />
-                <span className="truncate">May 15 – 18, 2026</span>
+                <span className="truncate">{event.date}</span>
               </span>
               <span className="flex items-center gap-2.5 min-w-0">
                 <MapPin className="w-5 h-5 text-saffron shrink-0" />
-                <span className="truncate sm:whitespace-normal">Thyagaraj Sports Complex, New Delhi</span>
+                <span className="truncate sm:whitespace-normal">{event.location}</span>
               </span>
             </div>
 
             <p className="text-slate-600 leading-relaxed">
-              The premier national wheelchair rugby tournament featuring teams
-              from across India. Six days of intense competition, skill
-              showcases, and an inclusive sports festival.
+              {event.description}
             </p>
 
             {/* Countdown */}
-            <div>
-              <p className="text-slate-500 text-xs font-semibold uppercase tracking-widest mb-3">
-                Event starts in
-              </p>
-              <Countdown />
-            </div>
+            {event.countdown_date && (
+              <div>
+                <p className="text-slate-500 text-xs font-semibold uppercase tracking-widest mb-3">
+                  Event starts in
+                </p>
+                <Countdown targetISO={event.countdown_date} />
+              </div>
+            )}
 
             {/* Register button */}
             <a
-              href="#contact"
+              href={event.register_url || "#contact"}
               className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto px-8 py-4 bg-saffron hover:bg-saffron-dark text-white font-bold rounded-full text-lg transition-all hover:shadow-xl hover:shadow-saffron/30 pulse-cta"
             >
               Register Now
